@@ -91,14 +91,18 @@ export async function getCategories() {
 
 // Get categories formatted for navigation (Header/Footer)
 export async function getNavigationCategories() {
-  const supabase = await createClient()
+  try {
+    const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('categories')
-    .select('*')
-    .order('name')
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .order('name')
 
-  if (error) throw error
+    if (error) {
+      console.error('Error fetching navigation categories:', error)
+      return []
+    }
 
   const categories = data as Category[]
 
@@ -129,6 +133,10 @@ export async function getNavigationCategories() {
       ...(subcategories.length > 0 ? { subcategories } : {}),
     }
   })
+  } catch (error) {
+    console.error('Error in getNavigationCategories:', error)
+    return []
+  }
 }
 
 export async function getCategoryBySlug(slug: string) {
