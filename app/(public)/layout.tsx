@@ -2,6 +2,8 @@ import { Header, Footer } from '@/components/layout'
 import { SmoothScrollProvider } from '@/components/providers/SmoothScrollProvider'
 import { getNavigationCategories } from '@/lib/supabase/queries'
 
+export const dynamic = 'force-dynamic'
+
 export default async function PublicLayout({
   children,
 }: {
