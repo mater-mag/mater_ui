@@ -1,17 +1,10 @@
-import { type NextRequest, NextResponse } from 'next/server'
-import { updateSession } from './lib/supabase/middleware'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  try {
-    // Skip middleware if Supabase env vars are not set
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-      return NextResponse.next()
-    }
-    return await updateSession(request)
-  } catch (error) {
-    console.error('Middleware error:', error)
-    return NextResponse.next()
-  }
+export function middleware(request: NextRequest) {
+  // Simple middleware that just passes through
+  // Auth checks are handled at the page level
+  return NextResponse.next()
 }
 
 export const config = {

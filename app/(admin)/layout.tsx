@@ -131,6 +131,7 @@ export default function AdminLayout({
   const pathname = usePathname()
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => {
@@ -138,6 +139,10 @@ export default function AdminLayout({
 
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
+      setLoading(false)
+      if (!user) {
+        router.push('/login')
+      }
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -161,6 +166,20 @@ export default function AdminLayout({
 
   const displayName = getUserDisplayName(user)
   const initial = getUserInitial(user)
+
+  // Show loading state while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--admin-bg)]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--admin-green)]"></div>
+      </div>
+    )
+  }
+
+  // Don't render admin layout if not authenticated
+  if (!user) {
+    return null
+  }
 
   return (
     <div className="flex min-h-screen">
