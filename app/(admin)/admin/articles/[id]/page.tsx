@@ -195,7 +195,7 @@ export default function EditArticlePage() {
           seo_data: seoData,
           published_at: publishStatus === 'published' ? new Date().toISOString() : null,
           updated_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', articleId)
 
       if (error) throw error

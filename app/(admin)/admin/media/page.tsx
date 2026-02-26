@@ -72,7 +72,7 @@ export default function MediaPage() {
         alt: file.name.replace(/\.[^/.]+$/, ''),
         mime_type: file.type,
         size: file.size,
-      })
+      } as never)
     }
 
     setUploading(false)

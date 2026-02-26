@@ -70,7 +70,7 @@ export default function AuthorsPage() {
       name: newAuthorName,
       email: newAuthorEmail || null,
       bio: newAuthorBio || null,
-    })
+    } as never)
 
     if (error) {
       console.error('Error adding author:', error)

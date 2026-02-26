@@ -92,7 +92,7 @@ export default function EditAuthorPage() {
           bio: bio || null,
           avatar: avatar || null,
           updated_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', authorId)
 
       if (error) throw error

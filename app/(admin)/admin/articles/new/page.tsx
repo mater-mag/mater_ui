@@ -110,7 +110,7 @@ export default function NewArticlePage() {
         status: publishStatus,
         seo_data: seoData,
         published_at: publishStatus === 'published' ? new Date().toISOString() : null,
-      })
+      } as never)
 
       if (error) throw error
 
