@@ -27,8 +27,8 @@
   --dark-bg: #1a1a1a;
 
   /* Typography */
-  --font-sans: var(--font-manrope), system-ui, -apple-system, sans-serif;
-  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-open-sans), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-lora), Georgia, serif;
 
   /* Spacing */
   --container-padding: 1.5rem;

@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
-import { Manrope, Playfair_Display } from "next/font/google"
+import { Open_Sans, Lora } from "next/font/google"
 import "./globals.css"
 
-const manrope = Manrope({
-  variable: "--font-manrope",
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
   subsets: ["latin", "latin-ext"],
 })
 
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const lora = Lora({
+  variable: "--font-lora",
   subsets: ["latin", "latin-ext"],
 })
 
@@ -40,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="hr">
-      <body className={`${manrope.variable} ${playfair.variable} antialiased`}>
+      <body className={`${openSans.variable} ${lora.variable} antialiased`}>
         {children}
       </body>
     </html>
