@@ -27,9 +27,9 @@
   --coral-light: #F8ECE3;
   --dark-bg: #1a1a1a;
 
-  /* Typography */
-  --font-sans: var(--font-open-sans), system-ui, -apple-system, sans-serif;
-  --font-serif: var(--font-lora), Georgia, serif;
+  /* Typography - these get set by Next.js font loader */
+  --font-body: var(--font-open-sans), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-lora), Georgia, serif;
 
   /* Spacing */
   --container-padding: 1.5rem;
@@ -55,8 +55,8 @@
   --color-coral-dark: var(--coral-dark);
   --color-coral-light: var(--coral-light);
   --color-dark-bg: var(--dark-bg);
-  --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
+  --font-sans: var(--font-open-sans), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-lora), Georgia, serif;
 }
 
 @layer base {
@@ -92,7 +92,7 @@
   body {
     background: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
+    font-family: var(--font-open-sans), system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -100,7 +100,7 @@
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
+    font-family: var(--font-lora), Georgia, serif;
     font-weight: 600;
     line-height: 1.2;
   }
