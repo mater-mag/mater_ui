@@ -488,8 +488,8 @@ export default function HomePage() {
                 Prijavite se na naš newsletter
               </p>
             </div>
-            <form onSubmit={handleNewsletterSubmit} className="flex w-full md:w-auto gap-3 animate-in">
-              <div className="flex-1 md:w-64">
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row w-full md:w-auto gap-3 animate-in">
+              <div className="w-full sm:w-64">
                 <div className="flex items-center bg-white border border-foreground/10 rounded px-4 py-3">
                   <svg className="w-4 h-4 text-foreground/40 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -506,7 +506,7 @@ export default function HomePage() {
               </div>
               <button
                 type="submit"
-                className="px-5 py-3 bg-coral text-white text-sm font-medium rounded hover:bg-coral-dark whitespace-nowrap transition-colors"
+                className="w-full sm:w-auto px-5 py-3 bg-coral text-white text-sm font-medium rounded hover:bg-coral-dark whitespace-nowrap transition-colors"
               >
                 Prijavi se
               </button>
