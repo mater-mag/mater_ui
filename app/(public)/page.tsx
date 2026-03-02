@@ -477,7 +477,7 @@ export default function HomePage() {
       )}
 
       {/* Newsletter Section */}
-      <section ref={(el) => { sectionsRef.current[3] = el }} className="bg-coral-light py-12 md:py-16">
+      <section ref={(el) => { sectionsRef.current[3] = el }} className="bg-coral-light py-16 md:py-24">
         <div className="container">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="animate-in">
@@ -506,7 +506,7 @@ export default function HomePage() {
               </div>
               <button
                 type="submit"
-                className="w-full sm:w-auto px-5 py-3 bg-coral text-white text-sm font-medium rounded hover:bg-coral-dark whitespace-nowrap transition-colors"
+                className="w-full sm:w-auto px-5 py-3 bg-foreground text-white text-sm font-medium rounded hover:bg-black whitespace-nowrap transition-colors"
               >
                 Prijavi se
               </button>
