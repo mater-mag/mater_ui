@@ -327,7 +327,7 @@ export default function HomePage() {
                     href={`/${slide.category?.slug || 'vijesti'}/${slide.slug}`}
                     className="block group w-full flex-shrink-0"
                   >
-                    <div className="aspect-[16/9] md:aspect-[2/1] relative overflow-hidden">
+                    <div className="aspect-[4/5] md:aspect-[2/1] relative overflow-hidden">
                       <ArticleMedia
                         article={slide}
                         sizes="100vw"
