@@ -7,9 +7,9 @@
   --muted: #f5f0eb;
   --muted-foreground: #737373;
   --border: #e8e3de;
-  --accent: #C66B3D;
+  --accent: #D06747;
   --accent-foreground: #ffffff;
-  --primary: #C66B3D;
+  --primary: #D06747;
   --primary-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
@@ -22,8 +22,9 @@
   --admin-green-dark: #1a5632;
 
   /* Public site - Terracotta accent */
-  --coral: #C66B3D;
-  --coral-dark: #a85a32;
+  --coral: #D06747;
+  --coral-dark: #b8573c;
+  --coral-light: #F8ECE3;
   --dark-bg: #1a1a1a;
 
   /* Typography */
@@ -52,6 +53,7 @@
   --color-admin-green-dark: var(--admin-green-dark);
   --color-coral: var(--coral);
   --color-coral-dark: var(--coral-dark);
+  --color-coral-light: var(--coral-light);
   --color-dark-bg: var(--dark-bg);
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
