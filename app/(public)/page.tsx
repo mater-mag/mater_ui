@@ -240,7 +240,7 @@ export default function HomePage() {
         .select(`*, category:categories(*), author:authors(*)`)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .range(4, 12)
+        .range(0, 8)
 
       if (interviewCategoryId) {
         novostiQuery = novostiQuery.neq('category_id', interviewCategoryId)
@@ -277,7 +277,7 @@ export default function HomePage() {
         .select(`*, category:categories(*), author:authors(*)`)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .range(13, 21)
+        .range(9, 17)
 
       // Fetch popularno articles (3 articles after izdvojeno: positions 22-24)
       const { data: popularnoData } = await supabase
@@ -285,7 +285,7 @@ export default function HomePage() {
         .select(`*, category:categories(*), author:authors(*)`)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .range(22, 24)
+        .range(18, 20)
 
       setHeroSlides((heroData || []) as ArticleWithRelations[])
       setNovostiArticles((novostiData || []) as ArticleWithRelations[])
