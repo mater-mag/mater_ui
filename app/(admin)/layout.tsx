@@ -189,11 +189,11 @@ export default function AdminLayout({
         <div className="px-6 py-5 border-b border-gray-100">
           <Link href="/admin" className="flex items-center">
             <Image
-              src="/logo.svg"
+              src="/logos/MATER_Logotip-04.svg"
               alt="Matermag"
-              width={140}
-              height={40}
-              className="h-8 w-auto invert"
+              width={180}
+              height={50}
+              className="h-12 w-auto"
               priority
             />
           </Link>

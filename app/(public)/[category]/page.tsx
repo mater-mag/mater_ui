@@ -41,7 +41,8 @@ const ARTICLES_PER_PAGE = 9
 export default function CategoryPage() {
   const params = useParams()
   const searchParams = useSearchParams()
-  const categorySlug = params.category as string
+  // Decode URL to handle special characters like ć, č, š, etc.
+  const categorySlug = decodeURIComponent(params.category as string)
   const tagFromUrl = searchParams.get('tag') || ''
 
   const [category, setCategory] = useState<CategoryWithChildren | null>(null)
@@ -372,39 +373,39 @@ export default function CategoryPage() {
         </section>
       )}
 
-      {/* Newsletter Banner */}
-      <section className="bg-coral py-12 mb-12">
+      {/* Newsletter Section */}
+      <section className="bg-coral-light py-16 md:py-24 mb-12">
         <div className="container">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div>
-              <h2 className="font-serif text-2xl md:text-3xl font-bold text-white mb-2">
-                Ostanite u korak s trendovima
+              <h2 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-2">
+                Ostanite u korak s <em className="text-coral">trendovima</em>
               </h2>
-              <p className="text-white/80">
+              <p className="text-foreground/60 text-sm">
                 Prijavite se na naš newsletter
               </p>
             </div>
-            <form onSubmit={handleNewsletterSubmit} className="flex w-full md:w-auto gap-3">
-              <div className="flex-1 md:w-80">
-                <div className="flex items-center bg-white rounded-lg px-4 py-3">
-                  <svg className="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
+              <div className="w-full sm:w-64">
+                <div className="flex items-center bg-white border border-foreground/10 rounded px-4 py-3">
+                  <svg className="w-4 h-4 text-foreground/40 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <input
                     type="email"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
-                    placeholder="Unesite vaš email..."
-                    className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+                    placeholder="Vaš email"
+                    className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none"
                     required
                   />
                 </div>
               </div>
               <button
                 type="submit"
-                className="px-6 py-3 bg-dark-bg text-white font-medium rounded-lg hover:bg-black whitespace-nowrap"
+                className="w-full sm:w-auto px-5 py-3 bg-foreground text-white text-sm font-medium rounded hover:bg-black whitespace-nowrap transition-colors"
               >
-                Preplati se
+                Prijavi se
               </button>
             </form>
           </div>

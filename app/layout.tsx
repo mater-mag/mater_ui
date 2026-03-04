@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Open_Sans, Lora } from "next/font/google"
+import localFont from "next/font/local"
 import "./globals.css"
 
 const openSans = Open_Sans({
@@ -10,6 +11,12 @@ const openSans = Open_Sans({
 const lora = Lora({
   variable: "--font-lora",
   subsets: ["latin", "latin-ext"],
+})
+
+const lexendGiga = localFont({
+  src: "../public/fonts/LexendGiga-VariableFont_wght.ttf",
+  variable: "--font-lexend-giga",
+  display: "swap",
 })
 
 export const metadata: Metadata = {
@@ -40,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="hr">
-      <body className={`${openSans.variable} ${lora.variable} antialiased`}>
+      <body className={`${openSans.variable} ${lora.variable} ${lexendGiga.variable} antialiased`}>
         {children}
       </body>
     </html>

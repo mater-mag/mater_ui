@@ -57,6 +57,7 @@
   --color-dark-bg: var(--dark-bg);
   --font-sans: var(--font-open-sans), system-ui, -apple-system, sans-serif;
   --font-serif: var(--font-lora), Georgia, serif;
+  --font-display: var(--font-lexend-giga), system-ui, sans-serif;
 }
 
 @layer base {

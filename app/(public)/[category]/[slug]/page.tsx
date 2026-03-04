@@ -23,6 +23,8 @@ interface ArticleWithRelations {
   content: string
   excerpt: string | null
   featured_image: string | null
+  featured_video: string | null
+  media_type: 'image' | 'video'
   category_id: string | null
   author_id: string | null
   status: 'draft' | 'published' | 'archived'
@@ -34,6 +36,69 @@ interface ArticleWithRelations {
 }
 
 const placeholderImage = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1920&q=80'
+
+// Helper function to render video with proper dimensions
+function VideoPlayer({ videoUrl, title }: { videoUrl: string; title: string }) {
+  const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')
+  const isVimeo = videoUrl.includes('vimeo.com')
+
+  if (isYouTube) {
+    let videoId = ''
+    try {
+      if (videoUrl.includes('youtu.be')) {
+        videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+      } else if (videoUrl.includes('youtube.com/shorts/')) {
+        videoId = videoUrl.split('/shorts/')[1]?.split('?')[0] || ''
+      } else {
+        videoId = new URL(videoUrl).searchParams.get('v') || ''
+      }
+    } catch {
+      const match = videoUrl.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/)
+      videoId = match ? match[1] : ''
+    }
+
+    if (videoId) {
+      return (
+        <div className="aspect-video w-full">
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?rel=0`}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+            title={title}
+          />
+        </div>
+      )
+    }
+  }
+
+  if (isVimeo) {
+    const videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+    if (videoId) {
+      return (
+        <div className="aspect-video w-full">
+          <iframe
+            src={`https://player.vimeo.com/video/${videoId}`}
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title={title}
+          />
+        </div>
+      )
+    }
+  }
+
+  // Direct video file - let it determine its own dimensions
+  return (
+    <video
+      src={videoUrl}
+      className="w-full h-auto"
+      controls
+      playsInline
+    />
+  )
+}
 
 function ShareButton({ platform, url, title }: { platform: string; url: string; title: string }) {
   const shareUrls: Record<string, string> = {
@@ -87,8 +152,8 @@ function ShareButton({ platform, url, title }: { platform: string; url: string; 
 
 export default function ArticlePage() {
   const params = useParams()
-  const slug = params.slug as string
-  const categorySlug = params.category as string
+  const slug = decodeURIComponent(params.slug as string)
+  const categorySlug = decodeURIComponent(params.category as string)
 
   const [article, setArticle] = useState<ArticleWithRelations | null>(null)
   const [relatedArticles, setRelatedArticles] = useState<ArticleWithRelations[]>([])
@@ -268,8 +333,14 @@ export default function ArticlePage() {
             </div>
           </aside>
 
-          {/* Featured Image */}
-          {article.featured_image && (
+          {/* Featured Media (Image or Video) */}
+          {article.media_type === 'video' && article.featured_video ? (
+            <figure className="mb-8">
+              <div className="rounded-lg overflow-hidden bg-black">
+                <VideoPlayer videoUrl={article.featured_video} title={article.title} />
+              </div>
+            </figure>
+          ) : article.featured_image && (
             <figure className="mb-8">
               <div className="aspect-[16/10] relative rounded-lg overflow-hidden">
                 <Image

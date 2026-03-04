@@ -397,10 +397,19 @@ export default function EditArticlePage() {
                         src={featuredVideo}
                         className="w-full h-full object-cover"
                         muted
+                        controls
                       />
                     )}
                   </div>
                 )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full mt-4"
+                  onClick={() => setMediaOpen(true)}
+                >
+                  Odaberi iz medijateke
+                </Button>
               </>
             )}
           </div>
@@ -466,7 +475,15 @@ export default function EditArticlePage() {
       <MediaLibraryModal
         open={mediaOpen}
         onClose={() => setMediaOpen(false)}
-        onSelect={(media) => setFeaturedImage(media.url)}
+        onSelect={(media) => {
+          if (media.type === 'video') {
+            setFeaturedVideo(media.url)
+            setMediaType('video')
+          } else {
+            setFeaturedImage(media.url)
+            setMediaType('image')
+          }
+        }}
       />
     </form>
   )

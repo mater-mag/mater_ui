@@ -97,9 +97,13 @@ export function MediaLibraryModal({ open, onClose, onSelect, multiple, onSelectM
       const supabase = createClient()
 
       for (const file of Array.from(files)) {
-        // Validate file
-        if (file.size > 10 * 1024 * 1024) {
-          setUploadError(`Datoteka "${file.name}" je prevelika (max 10MB)`)
+        // Validate file - 10MB for images, 200MB for videos
+        const isVideo = file.type.startsWith('video/')
+        const maxSize = isVideo ? 200 * 1024 * 1024 : 10 * 1024 * 1024
+        const maxSizeLabel = isVideo ? '200MB' : '10MB'
+
+        if (file.size > maxSize) {
+          setUploadError(`Datoteka "${file.name}" je prevelika (max ${maxSizeLabel})`)
           continue
         }
 
@@ -236,6 +240,22 @@ export function MediaLibraryModal({ open, onClose, onSelect, multiple, onSelectM
                         className="object-cover"
                         sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, 20vw"
                       />
+                    ) : item.type === 'video' ? (
+                      <div className="w-full h-full relative bg-gray-900">
+                        <video
+                          src={item.url}
+                          className="w-full h-full object-cover"
+                          muted
+                          preload="metadata"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-900 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100">
                         <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -206,7 +206,7 @@ export function Footer({ categories = [] }: FooterProps) {
             {'MATER'.split('').map((letter, i) => (
               <span
                 key={i}
-                className="font-sans font-bold text-foreground leading-none"
+                className="font-display font-normal text-foreground leading-none"
                 style={{ fontSize: 'clamp(80px, 20vw, 280px)' }}
               >
                 {letter}

@@ -37,17 +37,82 @@ interface ArticleWithRelations {
 // Placeholder image for articles without images
 const placeholderImage = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1920&q=80'
 
+// Video player component with controls and proper dimensions
+function VideoPlayer({ videoUrl, title }: { videoUrl: string; title: string }) {
+  const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')
+  const isVimeo = videoUrl.includes('vimeo.com')
+
+  if (isYouTube) {
+    let videoId = ''
+    try {
+      if (videoUrl.includes('youtu.be')) {
+        videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+      } else if (videoUrl.includes('youtube.com/shorts/')) {
+        videoId = videoUrl.split('/shorts/')[1]?.split('?')[0] || ''
+      } else {
+        videoId = new URL(videoUrl).searchParams.get('v') || ''
+      }
+    } catch {
+      const match = videoUrl.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/)
+      videoId = match ? match[1] : ''
+    }
+
+    if (videoId) {
+      return (
+        <div className="aspect-video">
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?rel=0`}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+            title={title}
+          />
+        </div>
+      )
+    }
+  }
+
+  if (isVimeo) {
+    const videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+    if (videoId) {
+      return (
+        <div className="aspect-video">
+          <iframe
+            src={`https://player.vimeo.com/video/${videoId}`}
+            className="w-full h-full"
+            allow="autoplay; fullscreen; picture-in-picture"
+            allowFullScreen
+            title={title}
+          />
+        </div>
+      )
+    }
+  }
+
+  // Direct video file - let it determine its own dimensions
+  return (
+    <video
+      src={videoUrl}
+      className="w-full h-auto"
+      controls
+      playsInline
+    />
+  )
+}
+
 // Component to render either image or video
 function ArticleMedia({
   article,
   className = '',
   sizes = '100vw',
-  priority = false
+  priority = false,
+  showControls = false
 }: {
   article: ArticleWithRelations
   className?: string
   sizes?: string
   priority?: boolean
+  showControls?: boolean
 }) {
   const isVideo = article.media_type === 'video' && article.featured_video
 
@@ -57,41 +122,64 @@ function ArticleMedia({
     const isVimeo = videoUrl.includes('vimeo.com')
 
     if (isYouTube) {
-      const videoId = videoUrl.includes('youtu.be')
-        ? videoUrl.split('/').pop()
-        : new URL(videoUrl).searchParams.get('v')
-      return (
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0`}
-          className={`absolute inset-0 w-full h-full ${className}`}
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          title={article.title}
-        />
-      )
+      let videoId = ''
+      try {
+        if (videoUrl.includes('youtu.be')) {
+          videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+        } else if (videoUrl.includes('youtube.com/shorts/')) {
+          videoId = videoUrl.split('/shorts/')[1]?.split('?')[0] || ''
+        } else {
+          videoId = new URL(videoUrl).searchParams.get('v') || ''
+        }
+      } catch {
+        // Fallback: try to extract video ID with regex
+        const match = videoUrl.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/)
+        videoId = match ? match[1] : ''
+      }
+
+      if (videoId) {
+        const params = showControls
+          ? `controls=1&rel=0`
+          : `autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0`
+        return (
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?${params}`}
+            className={`absolute inset-0 w-full h-full ${className}`}
+            allow="autoplay; encrypted-media; fullscreen"
+            allowFullScreen
+            title={article.title}
+          />
+        )
+      }
     }
 
     if (isVimeo) {
-      const videoId = videoUrl.split('/').pop()
-      return (
-        <iframe
-          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&background=1`}
-          className={`absolute inset-0 w-full h-full ${className}`}
-          allow="autoplay; fullscreen"
-          allowFullScreen
-          title={article.title}
-        />
-      )
+      const videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+      if (videoId) {
+        const params = showControls
+          ? ``
+          : `autoplay=1&muted=1&loop=1&background=1`
+        return (
+          <iframe
+            src={`https://player.vimeo.com/video/${videoId}?${params}`}
+            className={`absolute inset-0 w-full h-full ${className}`}
+            allow="autoplay; fullscreen"
+            allowFullScreen
+            title={article.title}
+          />
+        )
+      }
     }
 
     return (
       <video
         src={videoUrl}
         className={`object-cover w-full h-full ${className}`}
-        autoPlay
-        muted
-        loop
+        autoPlay={!showControls}
+        muted={!showControls}
+        loop={!showControls}
         playsInline
+        controls={showControls}
       />
     )
   }
@@ -114,7 +202,7 @@ export default function HomePage() {
   const [novostiArticles, setNovostiArticles] = useState<ArticleWithRelations[]>([])
   const [intervjuTjedna, setIntervjuTjedna] = useState<ArticleWithRelations | null>(null)
   const [izdvojenoArticles, setIzdvojenoArticles] = useState<ArticleWithRelations[]>([])
-  const [popularnoArticle, setPopularnoArticle] = useState<ArticleWithRelations | null>(null)
+  const [popularnoArticles, setPopularnoArticles] = useState<ArticleWithRelations[]>([])
   const [intervjuArticles, setIntervjuArticles] = useState<ArticleWithRelations[]>([])
   const [loading, setLoading] = useState(true)
   const [dataFetched, setDataFetched] = useState(false)
@@ -146,13 +234,13 @@ export default function HomePage() {
         .order('published_at', { ascending: false })
         .limit(4)
 
-      // Fetch novosti articles (next 3)
+      // Fetch novosti articles (9 articles after hero: positions 4-12)
       let novostiQuery = supabase
         .from('articles')
         .select(`*, category:categories(*), author:authors(*)`)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .range(1, 3)
+        .range(4, 12)
 
       if (interviewCategoryId) {
         novostiQuery = novostiQuery.neq('category_id', interviewCategoryId)
@@ -183,27 +271,26 @@ export default function HomePage() {
         setIntervjuArticles((moreInterviews || []) as ArticleWithRelations[])
       }
 
-      // Fetch izdvojeno articles
+      // Fetch izdvojeno articles (9 articles after novosti: positions 13-21)
       const { data: izdvojenoData } = await supabase
         .from('articles')
         .select(`*, category:categories(*), author:authors(*)`)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .range(4, 7)
+        .range(13, 21)
 
-      // Fetch popularno article
+      // Fetch popularno articles (3 articles after izdvojeno: positions 22-24)
       const { data: popularnoData } = await supabase
         .from('articles')
         .select(`*, category:categories(*), author:authors(*)`)
         .eq('status', 'published')
         .order('published_at', { ascending: false })
-        .range(8, 8)
-        .single()
+        .range(22, 24)
 
       setHeroSlides((heroData || []) as ArticleWithRelations[])
       setNovostiArticles((novostiData || []) as ArticleWithRelations[])
       setIzdvojenoArticles((izdvojenoData || []) as ArticleWithRelations[])
-      setPopularnoArticle(popularnoData as ArticleWithRelations | null)
+      setPopularnoArticles((popularnoData || []) as ArticleWithRelations[])
       setLoading(false)
       setDataFetched(true)
     }
@@ -289,12 +376,12 @@ export default function HomePage() {
       <section ref={(el) => { sectionsRef.current[0] = el }} className="pt-4 pb-16 overflow-hidden">
         {/* Full Width MATER Branding - edge to edge */}
         <div className="mb-6 animate-in">
-          <h1 className="flex justify-between w-full px-4 md:px-8">
+          <h1 className="flex justify-between w-full px-2 md:px-4">
             {'MATER'.split('').map((letter, i) => (
               <span
                 key={i}
-                className="font-sans font-semibold text-coral leading-none"
-                style={{ fontSize: 'clamp(84px, 24vw, 400px)' }}
+                className="font-display font-normal text-coral leading-none"
+                style={{ fontSize: 'clamp(58px, 18vw, 336px)' }}
               >
                 {letter}
               </span>
@@ -419,9 +506,14 @@ export default function HomePage() {
                   <p className="text-[11px] uppercase tracking-wider text-coral font-medium mb-2">
                     {article.category?.name}
                   </p>
-                  <h3 className="font-serif text-lg md:text-xl font-semibold leading-snug text-foreground group-hover:text-coral transition-colors">
+                  <h3 className="font-serif text-lg md:text-xl font-semibold leading-snug text-foreground group-hover:text-coral transition-colors mb-2">
                     {article.title}
                   </h3>
+                  {article.excerpt && (
+                    <p className="text-foreground/60 text-sm leading-relaxed line-clamp-2">
+                      {article.excerpt}
+                    </p>
+                  )}
                 </Link>
               </article>
             ))}
@@ -439,17 +531,26 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-            {/* Left - Image */}
+            {/* Left - Image/Video */}
             <div className="animate-in">
-              <Link href={`/${intervjuTjedna.category?.slug || 'intervjui'}/${intervjuTjedna.slug}`} className="block group">
-                <div className="aspect-[3/4] relative overflow-hidden rounded-sm">
-                  <ArticleMedia
-                    article={intervjuTjedna}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="transition-transform duration-700 group-hover:scale-105"
+              {intervjuTjedna.media_type === 'video' && intervjuTjedna.featured_video ? (
+                <div className="relative overflow-hidden rounded-sm bg-black">
+                  <VideoPlayer
+                    videoUrl={intervjuTjedna.featured_video}
+                    title={intervjuTjedna.title}
                   />
                 </div>
-              </Link>
+              ) : (
+                <Link href={`/${intervjuTjedna.category?.slug || 'intervjui'}/${intervjuTjedna.slug}`} className="block group">
+                  <div className="aspect-[3/4] relative overflow-hidden rounded-sm">
+                    <ArticleMedia
+                      article={intervjuTjedna}
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                </Link>
+              )}
             </div>
 
             {/* Right - Text Content */}
@@ -524,72 +625,32 @@ export default function HomePage() {
             <div className="w-full h-px bg-foreground/10"></div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Left - Large Featured Article */}
-            <article className="group animate-in">
-              <Link href={`/${izdvojenoArticles[0].category?.slug || 'vijesti'}/${izdvojenoArticles[0].slug}`}>
-                <div className="aspect-[5/4] relative overflow-hidden rounded-sm mb-4">
-                  <ArticleMedia
-                    article={izdvojenoArticles[0]}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="transition-transform duration-700 group-hover:scale-105"
-                  />
-                  {/* Author Avatar */}
-                  {izdvojenoArticles[0].author && (
-                    <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white overflow-hidden border-2 border-white shadow-md">
-                      {izdvojenoArticles[0].author.avatar ? (
-                        <Image
-                          src={izdvojenoArticles[0].author.avatar}
-                          alt={izdvojenoArticles[0].author.name}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center text-xs font-medium text-foreground/50">
-                          {izdvojenoArticles[0].author.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
+          {/* 3-Column Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {izdvojenoArticles.map((article) => (
+              <article key={article.id} className="group animate-in">
+                <Link href={`/${article.category?.slug || 'vijesti'}/${article.slug}`}>
+                  <div className="aspect-[4/3] relative overflow-hidden mb-4">
+                    <ArticleMedia
+                      article={article}
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <p className="text-[11px] uppercase tracking-wider text-coral font-medium mb-2">
+                    {article.category?.name}
+                  </p>
+                  <h3 className="font-serif text-lg md:text-xl font-semibold leading-snug text-foreground group-hover:text-coral transition-colors mb-2">
+                    {article.title}
+                  </h3>
+                  {article.excerpt && (
+                    <p className="text-foreground/60 text-sm leading-relaxed line-clamp-2">
+                      {article.excerpt}
+                    </p>
                   )}
-                </div>
-                <p className="text-[11px] uppercase tracking-wider text-foreground/40 mb-2">
-                  {izdvojenoArticles[0].category?.name}
-                </p>
-                <h3 className="font-serif text-xl md:text-2xl font-semibold leading-snug text-foreground group-hover:text-coral transition-colors">
-                  {izdvojenoArticles[0].title}
-                </h3>
-              </Link>
-            </article>
-
-            {/* Right - Three Smaller Articles */}
-            <div className="flex flex-col justify-between gap-4 h-full animate-in">
-              {izdvojenoArticles.slice(1, 4).map((article) => (
-                <article key={article.id} className="group">
-                  <Link href={`/${article.category?.slug || 'vijesti'}/${article.slug}`} className="flex gap-5">
-                    <div className="w-36 md:w-48 shrink-0 aspect-square relative overflow-hidden rounded-sm">
-                      <ArticleMedia
-                        article={article}
-                        sizes="160px"
-                        className="transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="flex flex-col justify-center py-1">
-                      <p className="text-[11px] uppercase tracking-wider text-foreground/40 mb-1.5">
-                        {article.category?.name}
-                      </p>
-                      <h3 className="font-serif text-base md:text-lg font-semibold leading-snug text-foreground group-hover:text-coral transition-colors line-clamp-2 mb-2">
-                        {article.title}
-                      </h3>
-                      {article.author && (
-                        <p className="text-xs text-foreground/40">
-                          {article.author.name}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                </article>
-              ))}
-            </div>
+                </Link>
+              </article>
+            ))}
           </div>
 
           {/* Bottom Divider */}
@@ -598,7 +659,7 @@ export default function HomePage() {
       )}
 
       {/* Popularno Section */}
-      {popularnoArticle && (
+      {popularnoArticles.length > 0 && (
         <section ref={(el) => { sectionsRef.current[5] = el }} className="container py-16 md:py-24">
           {/* Section Header with Divider */}
           <div className="animate-in mb-10">
@@ -606,40 +667,32 @@ export default function HomePage() {
             <div className="w-full h-px bg-foreground/10"></div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-            {/* Left - Text Content */}
-            <div className="flex flex-col justify-center animate-in order-2 lg:order-1">
-              <p className="text-[11px] uppercase tracking-wider text-foreground/40 mb-3">
-                {popularnoArticle.category?.name}
-              </p>
-              <h3 className="font-serif text-2xl md:text-3xl font-bold leading-tight mb-6">
-                {popularnoArticle.title}
-              </h3>
-              {popularnoArticle.excerpt && (
-                <p className="text-foreground/60 text-sm md:text-base leading-relaxed mb-8">
-                  {popularnoArticle.excerpt}
-                </p>
-              )}
-              <Link
-                href={`/${popularnoArticle.category?.slug || 'vijesti'}/${popularnoArticle.slug}`}
-                className="inline-flex items-center justify-center w-fit px-6 py-3 bg-coral hover:bg-coral-dark text-white text-sm font-medium rounded transition-colors"
-              >
-                Pročitaj više
-              </Link>
-            </div>
-
-            {/* Right - Image */}
-            <div className="animate-in order-1 lg:order-2">
-              <Link href={`/${popularnoArticle.category?.slug || 'vijesti'}/${popularnoArticle.slug}`} className="block group">
-                <div className="aspect-[4/3] relative overflow-hidden rounded-sm">
-                  <ArticleMedia
-                    article={popularnoArticle}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-              </Link>
-            </div>
+          {/* 3-Column Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {popularnoArticles.map((article) => (
+              <article key={article.id} className="group animate-in">
+                <Link href={`/${article.category?.slug || 'vijesti'}/${article.slug}`}>
+                  <div className="aspect-[4/3] relative overflow-hidden mb-4">
+                    <ArticleMedia
+                      article={article}
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
+                  <p className="text-[11px] uppercase tracking-wider text-coral font-medium mb-2">
+                    {article.category?.name}
+                  </p>
+                  <h3 className="font-serif text-lg md:text-xl font-semibold leading-snug text-foreground group-hover:text-coral transition-colors mb-2">
+                    {article.title}
+                  </h3>
+                  {article.excerpt && (
+                    <p className="text-foreground/60 text-sm leading-relaxed line-clamp-2">
+                      {article.excerpt}
+                    </p>
+                  )}
+                </Link>
+              </article>
+            ))}
           </div>
 
           {/* Bottom Divider */}
@@ -674,9 +727,14 @@ export default function HomePage() {
                   <p className="text-[10px] uppercase tracking-wider text-foreground/40 mb-2">
                     {article.category?.name}
                   </p>
-                  <h3 className="font-serif text-base md:text-lg font-semibold leading-snug group-hover:text-coral transition-colors">
+                  <h3 className="font-serif text-base md:text-lg font-semibold leading-snug group-hover:text-coral transition-colors mb-2">
                     {article.title}
                   </h3>
+                  {article.excerpt && (
+                    <p className="text-foreground/60 text-sm leading-relaxed line-clamp-2">
+                      {article.excerpt}
+                    </p>
+                  )}
                 </Link>
               </article>
             ))}

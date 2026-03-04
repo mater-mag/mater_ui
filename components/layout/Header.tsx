@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { gsap } from 'gsap'
 import { SearchModal } from './SearchModal'
@@ -171,9 +172,14 @@ export function Header({ categories = [] }: HeaderProps) {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="flex items-center">
-              <span className="text-2xl font-semibold tracking-[0.2em] text-foreground">
-                MATER
-              </span>
+              <Image
+                src="/logos/MATER_Logotip-04.svg"
+                alt="Mater"
+                width={160}
+                height={40}
+                className="h-10 w-auto"
+                priority
+              />
             </Link>
 
             {/* Desktop Navigation */}
@@ -288,9 +294,13 @@ export function Header({ categories = [] }: HeaderProps) {
             {/* Menu Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10 menu-item">
               <Link href="/" onClick={handleCloseMenu}>
-                <span className="text-2xl font-semibold tracking-[0.2em] text-white">
-                  M<span className="text-coral">.</span>
-                </span>
+                <Image
+                  src="/logos/MATER_Logotip-02.svg"
+                  alt="Mater"
+                  width={56}
+                  height={56}
+                  className="h-14 w-auto"
+                />
               </Link>
               <button
                 onClick={handleCloseMenu}
