@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams, notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { gsap } from 'gsap'
@@ -242,18 +242,9 @@ export default function CategoryPage() {
     )
   }
 
-  // Category not found
+  // Category not found - trigger global 404
   if (!category) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="font-serif text-4xl font-bold mb-4">Kategorija nije pronađena</h1>
-          <Link href="/" className="text-coral hover:text-coral-dark">
-            Povratak na početnu
-          </Link>
-        </div>
-      </div>
-    )
+    notFound()
   }
 
   return (

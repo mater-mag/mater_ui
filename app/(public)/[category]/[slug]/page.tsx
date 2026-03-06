@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { format } from 'date-fns'
@@ -278,18 +278,9 @@ export default function ArticlePage() {
     )
   }
 
-  // Article not found
+  // Article not found - trigger global 404
   if (!article) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="font-serif text-4xl font-bold mb-4">Članak nije pronađen</h1>
-          <Link href="/" className="text-coral hover:text-coral-dark">
-            Povratak na početnu
-          </Link>
-        </div>
-      </div>
-    )
+    notFound()
   }
 
   return (
