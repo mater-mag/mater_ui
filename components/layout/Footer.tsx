@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { openCookieSettings } from '@/components/cookies'
 
 interface Category {
   name: string
@@ -27,9 +28,9 @@ export function Footer({ categories = [] }: FooterProps) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-6">
           {/* Company Info */}
           <div className="col-span-2 md:col-span-1">
-            <p className="text-sm font-semibold uppercase tracking-wide mb-1">MATER MAG D.O.O.</p>
-            <p className="text-sm text-foreground/60">Ul. Primjer 123</p>
-            <p className="text-sm text-foreground/60">10000 Zagreb</p>
+            <p className="text-sm font-semibold uppercase tracking-wide mb-1">S&P OGLAŠAVANJE d.o.o.</p>
+            <p className="text-sm text-foreground/60">Ulica Ljudevita Posavskog 36B</p>
+            <p className="text-sm text-foreground/60">Zagreb</p>
           </div>
 
           {/* Social + Newsletter */}
@@ -93,7 +94,7 @@ export function Footer({ categories = [] }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/oglasavanje" className="text-sm uppercase tracking-wide hover:text-coral transition-colors">
+                <Link href="/page/oglasavanje" className="text-sm uppercase tracking-wide hover:text-coral transition-colors">
                   OGLAŠAVANJE
                 </Link>
               </li>
@@ -177,6 +178,14 @@ export function Footer({ categories = [] }: FooterProps) {
                 >
                   KOLAČIĆI
                 </Link>
+              </li>
+              <li>
+                <button
+                  onClick={openCookieSettings}
+                  className="text-sm uppercase tracking-wide hover:text-coral transition-colors"
+                >
+                  POSTAVKE KOLAČIĆA
+                </button>
               </li>
             </ul>
           </div>

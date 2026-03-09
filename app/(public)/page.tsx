@@ -6,7 +6,8 @@ import {
   HeroCarousel,
   IntervjuTjedna,
   LazyCategorySection,
-  NewsletterSection
+  NewsletterSection,
+  PopularnoSlider
 } from '@/components/homepage'
 
 // ISR: Revalidate every hour
@@ -16,9 +17,22 @@ export default async function HomePage() {
   const data = await getHomepageData()
 
   // Filter categories for dynamic sections (exclude 'intervjui')
-  const dynamicCategories = data.categories.filter(
-    (cat) => cat.slug !== 'intervjui'
-  )
+  // Custom order: savjeti-stručnjaka before bebe-i-djeca
+  const categoryOrder = ['savjeti-stručnjaka', 'bebe-i-djeca']
+  const dynamicCategories = data.categories
+    .filter((cat) => cat.slug !== 'intervjui')
+    .sort((a, b) => {
+      const aIndex = categoryOrder.indexOf(a.slug)
+      const bIndex = categoryOrder.indexOf(b.slug)
+      // If both are in the order list, sort by that order
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
+      // If only a is in the list, it comes first
+      if (aIndex !== -1) return -1
+      // If only b is in the list, it comes first
+      if (bIndex !== -1) return 1
+      // Otherwise keep alphabetical order
+      return a.name.localeCompare(b.name)
+    })
 
   return (
     <main className="bg-background">
@@ -52,8 +66,7 @@ export default async function HomePage() {
 
       {/* Popularno Section */}
       <AnimatedSection>
-        <ArticleSection
-          title="Popularno"
+        <PopularnoSlider
           articles={data.popularnoArticles}
           showDivider={true}
         />

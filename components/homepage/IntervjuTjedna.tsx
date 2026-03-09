@@ -19,19 +19,22 @@ export function IntervjuTjedna({ featured, grid }: IntervjuTjednaProps) {
       <SectionHeader title="Intervju tjedna/mjeseca" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
-        {/* Left - Image/Video */}
+        {/* Left - Image/Video - matches hero slider height */}
         <div className="animate-in">
           {featured.media_type === 'video' && featured.featured_video ? (
-            <div className="h-screen relative overflow-hidden rounded-sm bg-black">
+            <div className="aspect-[4/5] lg:aspect-[1/1] relative overflow-hidden rounded-sm bg-black">
               <VideoPlayer
                 videoUrl={featured.featured_video}
                 title={featured.title}
                 fill
+                autoplay
+                muted
+                loop
               />
             </div>
           ) : (
             <Link href={`/${featured.category?.slug || 'intervjui'}/${featured.slug}`} className="block group">
-              <div className="h-screen relative overflow-hidden rounded-sm">
+              <div className="aspect-[4/5] lg:aspect-[1/1] relative overflow-hidden rounded-sm">
                 <Image
                   src={featured.featured_image || placeholderImage}
                   alt={featured.title}

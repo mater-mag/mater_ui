@@ -44,7 +44,7 @@ export async function getHomepageData(): Promise<HomepageData> {
       .order('published_at', { ascending: false })
       .limit(4),
 
-    // Novosti (9 articles, excluding interviews)
+    // Novosti (6 articles, excluding interviews)
     interviewCategoryId
       ? supabase
           .from('articles')
@@ -52,13 +52,13 @@ export async function getHomepageData(): Promise<HomepageData> {
           .eq('status', 'published')
           .neq('category_id', interviewCategoryId)
           .order('published_at', { ascending: false })
-          .range(0, 8)
+          .range(0, 5)
       : supabase
           .from('articles')
           .select('*, category:categories(*), author:authors(*)')
           .eq('status', 'published')
           .order('published_at', { ascending: false })
-          .range(0, 8),
+          .range(0, 5),
 
     // Intervju featured (1 article)
     interviewCategoryId

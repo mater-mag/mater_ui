@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Open_Sans, Lora } from "next/font/google"
 import localFont from "next/font/local"
 import "./globals.css"
+import { CookieConsent, AnalyticsScripts } from "@/components/cookies"
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -49,6 +50,12 @@ export default function RootLayout({
     <html lang="hr">
       <body className={`${openSans.variable} ${lora.variable} ${lexendGiga.variable} antialiased`}>
         {children}
+        <CookieConsent />
+        <AnalyticsScripts
+          googleAnalyticsId={process.env.NEXT_PUBLIC_GA_ID}
+          googleAdsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}
+          metaPixelId={process.env.NEXT_PUBLIC_META_PIXEL_ID}
+        />
       </body>
     </html>
   )
