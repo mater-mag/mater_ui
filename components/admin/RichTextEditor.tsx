@@ -83,6 +83,17 @@ function MenuBar({ editor, onOpenMedia }: { editor: Editor | null; onOpenMedia: 
         <span className="font-bold text-sm">H3</span>
       </button>
 
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
+        className={`p-2 rounded hover:bg-muted ${
+          editor.isActive('heading', { level: 5 }) ? 'bg-muted text-accent' : ''
+        }`}
+        title="Istaknuti tekst (coral)"
+      >
+        <span className="font-bold text-sm text-coral">Q</span>
+      </button>
+
       <div className="w-px h-6 bg-border mx-1 self-center" />
 
       <button

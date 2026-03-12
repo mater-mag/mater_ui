@@ -170,6 +170,18 @@
     color: var(--coral);
   }
 
+  /* Highlighted quote style (H5) */
+  .prose h5 {
+    border-left: 4px solid var(--coral);
+    padding-left: 1.5rem;
+    color: var(--coral);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.125rem;
+    line-height: 1.75;
+    margin: 2rem 0;
+  }
+
   /* Selection */
   ::selection {
     background: var(--accent);

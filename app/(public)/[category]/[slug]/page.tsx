@@ -352,7 +352,6 @@ export default function ArticlePage() {
               prose-headings:font-serif prose-headings:font-bold
               prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
               prose-p:text-gray-700 prose-p:leading-relaxed
-              prose-blockquote:border-l-4 prose-blockquote:border-coral prose-blockquote:pl-6 prose-blockquote:py-1 prose-blockquote:text-coral prose-blockquote:not-italic prose-blockquote:font-normal
               prose-a:text-coral prose-a:no-underline hover:prose-a:underline
               prose-img:rounded-lg
             "
