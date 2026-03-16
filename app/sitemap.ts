@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from('pages')
     .select('slug, updated_at')
     .eq('status', 'published')
+    .returns<{ slug: string; updated_at: string }[]>()
 
   const pageUrls = (pages || []).map((page) => ({
     url: `${baseUrl}/${page.slug}`,
@@ -32,6 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: categories } = await supabase
     .from('categories')
     .select('slug, updated_at')
+    .returns<{ slug: string; updated_at: string }[]>()
 
   const categoryUrls = (categories || []).map((category) => ({
     url: `${baseUrl}/${category.slug}`,
@@ -45,9 +47,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from('articles')
     .select('slug, category:categories(slug), updated_at')
     .eq('status', 'published')
+    .returns<{ slug: string; updated_at: string; category: { slug: string } | null }[]>()
 
   const articleUrls = (articles || []).map((article) => {
-    const categorySlug = (article.category as { slug: string } | null)?.slug || 'vijesti'
+    const categorySlug = article.category?.slug || 'vijesti'
     return {
       url: `${baseUrl}/${categorySlug}/${article.slug}`,
       lastModified: new Date(article.updated_at),
