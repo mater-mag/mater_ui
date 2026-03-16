@@ -5,17 +5,20 @@ import Script from 'next/script'
 import { useCookieConsent, type CookiePreferences } from './CookieConsent'
 
 interface AnalyticsScriptsProps {
+  googleTagManagerId?: string
   googleAnalyticsId?: string
   googleAdsId?: string
   metaPixelId?: string
 }
 
 export function AnalyticsScripts({
+  googleTagManagerId,
   googleAnalyticsId,
   googleAdsId,
   metaPixelId,
 }: AnalyticsScriptsProps) {
   const preferences = useCookieConsent()
+  const [gtmLoaded, setGtmLoaded] = useState(false)
   const [analyticsLoaded, setAnalyticsLoaded] = useState(false)
   const [marketingLoaded, setMarketingLoaded] = useState(false)
 
@@ -24,8 +27,21 @@ export function AnalyticsScripts({
 
   return (
     <>
-      {/* Google Analytics */}
-      {preferences.analytics && googleAnalyticsId && !analyticsLoaded && (
+      {/* Google Tag Manager */}
+      {preferences.analytics && googleTagManagerId && !gtmLoaded && (
+        <Script id="google-tag-manager" strategy="afterInteractive" onLoad={() => setGtmLoaded(true)}>
+          {`
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','${googleTagManagerId}');
+          `}
+        </Script>
+      )}
+
+      {/* Google Analytics (standalone, use if not using GTM) */}
+      {preferences.analytics && googleAnalyticsId && !googleTagManagerId && !analyticsLoaded && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}

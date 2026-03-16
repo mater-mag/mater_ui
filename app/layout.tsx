@@ -46,12 +46,26 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID
+
   return (
     <html lang="hr">
       <body className={`${openSans.variable} ${lora.variable} ${lexendGiga.variable} antialiased`}>
+        {/* Google Tag Manager (noscript) - only renders if GTM_ID is set */}
+        {gtmId && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+        )}
         {children}
         <CookieConsent />
         <AnalyticsScripts
+          googleTagManagerId={gtmId}
           googleAnalyticsId={process.env.NEXT_PUBLIC_GA_ID}
           googleAdsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}
           metaPixelId={process.env.NEXT_PUBLIC_META_PIXEL_ID}
