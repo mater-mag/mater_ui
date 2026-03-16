@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/client'
 interface Author {
   id: string
   name: string
-  email: string | null
   bio: string | null
   avatar: string | null
   articleCount?: number
@@ -19,7 +18,6 @@ export default function AuthorsPage() {
   const [loading, setLoading] = useState(true)
   const [isAddingNew, setIsAddingNew] = useState(false)
   const [newAuthorName, setNewAuthorName] = useState('')
-  const [newAuthorEmail, setNewAuthorEmail] = useState('')
   const [newAuthorBio, setNewAuthorBio] = useState('')
 
   const fetchAuthors = async () => {
@@ -28,7 +26,7 @@ export default function AuthorsPage() {
     // Fetch authors
     const { data: authorsData } = await supabase
       .from('authors')
-      .select('id, name, email, bio, avatar')
+      .select('id, name, bio, avatar')
       .order('name')
 
     if (authorsData) {
@@ -68,7 +66,6 @@ export default function AuthorsPage() {
 
     const { error } = await supabase.from('authors').insert({
       name: newAuthorName,
-      email: newAuthorEmail || null,
       bio: newAuthorBio || null,
     } as never)
 
@@ -79,7 +76,6 @@ export default function AuthorsPage() {
     }
 
     setNewAuthorName('')
-    setNewAuthorEmail('')
     setNewAuthorBio('')
     setIsAddingNew(false)
     fetchAuthors()
@@ -138,13 +134,6 @@ export default function AuthorsPage() {
               onChange={(e) => setNewAuthorName(e.target.value)}
               placeholder="npr. Ivan Horvat"
             />
-            <Input
-              label="Email"
-              type="email"
-              value={newAuthorEmail}
-              onChange={(e) => setNewAuthorEmail(e.target.value)}
-              placeholder="ivan.horvat@matermag.hr"
-            />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Biografija
@@ -167,7 +156,6 @@ export default function AuthorsPage() {
                 onClick={() => {
                   setIsAddingNew(false)
                   setNewAuthorName('')
-                  setNewAuthorEmail('')
                   setNewAuthorBio('')
                 }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -207,7 +195,6 @@ export default function AuthorsPage() {
                 >
                   {author.name}
                 </Link>
-                <p className="text-sm text-gray-500 truncate">{author.email}</p>
               </div>
             </div>
 

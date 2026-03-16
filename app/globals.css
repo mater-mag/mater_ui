@@ -182,6 +182,43 @@
     margin: 2rem 0;
   }
 
+  /* Instagram embeds */
+  .prose .instagram-embed-container,
+  .prose [data-instagram-embed] {
+    margin: 2rem auto;
+    max-width: 540px;
+  }
+
+  .prose .instagram-media {
+    margin: 0 auto !important;
+  }
+
+  /* Editor Instagram embed placeholder */
+  .ProseMirror .instagram-embed-container {
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    color: white;
+    margin: 1rem 0;
+  }
+
+  .ProseMirror .instagram-embed-container::before {
+    content: "Instagram Post";
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .ProseMirror .instagram-embed-container::after {
+    content: attr(data-url);
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-top: 0.5rem;
+    word-break: break-all;
+  }
+
   /* Selection */
   ::selection {
     background: var(--accent);

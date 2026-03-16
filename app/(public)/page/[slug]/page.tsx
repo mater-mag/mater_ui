@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getPageBySlug } from '@/lib/supabase/queries'
+import { ArticleContent } from '@/components/ArticleContent'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,9 +45,9 @@ export default async function DynamicPage({ params }: PageProps) {
           {page.title}
         </h1>
         <div className="max-w-2xl mx-auto">
-          <div
+          <ArticleContent
+            content={page.content}
             className="prose prose-gray max-w-none prose-headings:font-serif prose-a:text-coral prose-blockquote:border-coral prose-blockquote:text-coral prose-blockquote:italic"
-            dangerouslySetInnerHTML={{ __html: page.content }}
           />
         </div>
       </div>

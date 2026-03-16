@@ -1,9 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui'
 
 export default function SettingsPage() {
+  const supabase = createClient()
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [settingsId, setSettingsId] = useState<string | null>(null)
   const [siteTitle, setSiteTitle] = useState('Matermag.hr')
   const [siteDescription, setSiteDescription] = useState('Lifestyle portal za moderne roditelje')
   const [defaultOgImage, setDefaultOgImage] = useState('')
@@ -13,9 +19,83 @@ Allow: /
 
 Sitemap: https://matermag.hr/sitemap.xml`)
 
-  const handleSave = () => {
-    // TODO: Save to Supabase
-    alert('Postavke spremljene!')
+  // Fetch settings on mount
+  useEffect(() => {
+    async function fetchSettings() {
+      setIsLoading(true)
+      const { data, error } = await supabase
+        .from('seo_settings')
+        .select('*')
+        .single()
+
+      if (!error && data) {
+        setSettingsId(data.id)
+        setSiteTitle(data.site_title || 'Matermag.hr')
+        setSiteDescription(data.site_description || '')
+        setDefaultOgImage(data.default_og_image || '')
+        setGoogleAnalyticsId(data.google_analytics_id || '')
+        setRobotsTxt(data.robots_txt || `User-agent: *
+Allow: /
+
+Sitemap: https://matermag.hr/sitemap.xml`)
+      }
+      setIsLoading(false)
+    }
+
+    fetchSettings()
+  }, [supabase])
+
+  const handleSave = async () => {
+    setIsSaving(true)
+
+    try {
+      if (settingsId) {
+        // Update existing settings
+        const { error } = await supabase
+          .from('seo_settings')
+          .update({
+            site_title: siteTitle,
+            site_description: siteDescription,
+            default_og_image: defaultOgImage || null,
+            google_analytics_id: googleAnalyticsId || null,
+            robots_txt: robotsTxt || null,
+          })
+          .eq('id', settingsId)
+
+        if (error) throw error
+      } else {
+        // Insert new settings
+        const { data, error } = await supabase
+          .from('seo_settings')
+          .insert({
+            site_title: siteTitle,
+            site_description: siteDescription,
+            default_og_image: defaultOgImage || null,
+            google_analytics_id: googleAnalyticsId || null,
+            robots_txt: robotsTxt || null,
+          })
+          .select()
+          .single()
+
+        if (error) throw error
+        if (data) setSettingsId(data.id)
+      }
+
+      alert('Postavke spremljene!')
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      alert('Greška pri spremanju postavki')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--admin-green-dark)]"></div>
+      </div>
+    )
   }
 
   return (
@@ -27,9 +107,10 @@ Sitemap: https://matermag.hr/sitemap.xml`)
         </div>
         <button
           onClick={handleSave}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--admin-green-dark)] text-white text-sm font-medium rounded-lg hover:bg-[var(--admin-green)] transition-colors"
+          disabled={isSaving}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-[var(--admin-green-dark)] text-white text-sm font-medium rounded-lg hover:bg-[var(--admin-green)] transition-colors disabled:opacity-50"
         >
-          Spremi postavke
+          {isSaving ? 'Spremanje...' : 'Spremi postavke'}
         </button>
       </div>
 
@@ -90,18 +171,22 @@ Sitemap: https://matermag.hr/sitemap.xml`)
         {/* Social Media Settings */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">Društvene mreže</h2>
+          <p className="text-sm text-gray-500 mb-4">Linkovi na društvene mreže se konfiguriraju u Footer komponenti.</p>
           <div className="space-y-4">
             <Input
               label="Facebook URL"
               placeholder="https://facebook.com/matermag"
+              disabled
             />
             <Input
               label="Instagram URL"
               placeholder="https://instagram.com/matermag"
+              disabled
             />
             <Input
               label="Twitter/X URL"
               placeholder="https://twitter.com/matermag"
+              disabled
             />
           </div>
         </section>

@@ -211,6 +211,34 @@ export default function ArticlePage() {
     fetchData()
   }, [slug])
 
+  // Load Instagram embeds
+  useEffect(() => {
+    if (!dataFetched || !article?.content) return
+
+    // Check if content has Instagram embeds
+    if (article.content.includes('instagram-media') || article.content.includes('data-instagram-embed')) {
+      // Load Instagram embed script
+      const script = document.createElement('script')
+      script.src = 'https://www.instagram.com/embed.js'
+      script.async = true
+      document.body.appendChild(script)
+
+      // Process embeds when script loads
+      script.onload = () => {
+        if ((window as unknown as { instgrm?: { Embeds: { process: () => void } } }).instgrm) {
+          (window as unknown as { instgrm: { Embeds: { process: () => void } } }).instgrm.Embeds.process()
+        }
+      }
+
+      return () => {
+        // Cleanup script on unmount
+        if (script.parentNode) {
+          script.parentNode.removeChild(script)
+        }
+      }
+    }
+  }, [dataFetched, article?.content])
+
   // GSAP animations
   useEffect(() => {
     if (!dataFetched) return

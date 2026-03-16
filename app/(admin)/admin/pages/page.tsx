@@ -1,14 +1,9 @@
 import Link from 'next/link'
+import { getPages } from '@/lib/supabase/queries'
 
-// Mock data
-const pages = [
-  { id: '1', title: 'O nama', slug: 'o-nama', status: 'published' as const },
-  { id: '2', title: 'Kontakt', slug: 'kontakt', status: 'published' as const },
-  { id: '3', title: 'Politika privatnosti', slug: 'privatnost', status: 'published' as const },
-  { id: '4', title: 'Uvjeti korištenja', slug: 'uvjeti-koristenja', status: 'published' as const },
-]
+export default async function PagesPage() {
+  const pages = await getPages()
 
-export default function PagesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -46,53 +41,61 @@ export default function PagesPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {pages.map((page) => (
-              <tr key={page.id} className="hover:bg-[var(--admin-green-light)]/50 transition-colors">
-                <td className="px-6 py-4">
-                  <Link
-                    href={`/admin/pages/${page.id}`}
-                    className="font-medium text-gray-900 hover:text-[var(--admin-green-dark)]"
-                  >
-                    {page.title}
-                  </Link>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  /page/{page.slug}
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
-                      page.status === 'published'
-                        ? 'bg-[var(--admin-green-light)] text-[var(--admin-green-dark)]'
-                        : 'bg-amber-50 text-amber-700'
-                    }`}
-                  >
-                    {page.status === 'published' ? 'Objavljeno' : 'Skica'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <div className="flex justify-end gap-3">
-                    <a
-                      href={`/page/${page.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-gray-400 hover:text-gray-600"
-                    >
-                      Pogledaj
-                    </a>
-                    <Link
-                      href={`/admin/pages/${page.id}`}
-                      className="text-sm font-medium text-[var(--admin-green)] hover:text-[var(--admin-green-dark)]"
-                    >
-                      Uredi
-                    </Link>
-                    <button className="text-sm font-medium text-red-500 hover:text-red-700">
-                      Obriši
-                    </button>
-                  </div>
+            {pages.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-12 text-center text-gray-500">
+                  Nema stranica. Kreirajte prvu stranicu.
                 </td>
               </tr>
-            ))}
+            ) : (
+              pages.map((page) => (
+                <tr key={page.id} className="hover:bg-[var(--admin-green-light)]/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <Link
+                      href={`/admin/pages/${page.id}`}
+                      className="font-medium text-gray-900 hover:text-[var(--admin-green-dark)]"
+                    >
+                      {page.title}
+                    </Link>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">
+                    /{page.slug}
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
+                        page.status === 'published'
+                          ? 'bg-[var(--admin-green-light)] text-[var(--admin-green-dark)]'
+                          : 'bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {page.status === 'published' ? 'Objavljeno' : 'Skica'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-3">
+                      <a
+                        href={`/${page.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-gray-400 hover:text-gray-600"
+                      >
+                        Pogledaj
+                      </a>
+                      <Link
+                        href={`/admin/pages/${page.id}`}
+                        className="text-sm font-medium text-[var(--admin-green)] hover:text-[var(--admin-green-dark)]"
+                      >
+                        Uredi
+                      </Link>
+                      <button className="text-sm font-medium text-red-500 hover:text-red-700">
+                        Obriši
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

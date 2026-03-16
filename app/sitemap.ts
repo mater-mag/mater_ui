@@ -1,7 +1,9 @@
 import { MetadataRoute } from 'next'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://matermag.hr'
+  const supabase = await createClient()
 
   // Static pages
   const staticPages = [
@@ -11,51 +13,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily' as const,
       priority: 1,
     },
-    {
-      url: `${baseUrl}/page/o-nama`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/page/kontakt`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
   ]
 
-  // Categories
-  const categories = ['vijesti', 'lifestyle', 'zdravlje', 'recepti', 'djeca']
-  const categoryPages = categories.map((slug) => ({
-    url: `${baseUrl}/${slug}`,
-    lastModified: new Date(),
+  // Fetch pages from Supabase
+  const { data: pages } = await supabase
+    .from('pages')
+    .select('slug, updated_at')
+    .eq('status', 'published')
+
+  const pageUrls = (pages || []).map((page) => ({
+    url: `${baseUrl}/${page.slug}`,
+    lastModified: new Date(page.updated_at),
+    changeFrequency: 'monthly' as const,
+    priority: 0.5,
+  }))
+
+  // Fetch categories from Supabase
+  const { data: categories } = await supabase
+    .from('categories')
+    .select('slug, updated_at')
+
+  const categoryUrls = (categories || []).map((category) => ({
+    url: `${baseUrl}/${category.slug}`,
+    lastModified: new Date(category.updated_at),
     changeFrequency: 'daily' as const,
     priority: 0.8,
   }))
 
-  // TODO: Fetch articles from Supabase
-  // const supabase = await createClient()
-  // const { data: articles } = await supabase
-  //   .from('articles')
-  //   .select('slug, category:categories(slug), updated_at')
-  //   .eq('status', 'published')
+  // Fetch articles from Supabase
+  const { data: articles } = await supabase
+    .from('articles')
+    .select('slug, category:categories(slug), updated_at')
+    .eq('status', 'published')
 
-  // Mock articles for now
-  const articlePages = [
-    {
-      url: `${baseUrl}/recepti/kako-pripremiti-zdravi-dorucak-za-cijelu-obitelj`,
-      lastModified: new Date('2026-01-20'),
+  const articleUrls = (articles || []).map((article) => {
+    const categorySlug = (article.category as { slug: string } | null)?.slug || 'vijesti'
+    return {
+      url: `${baseUrl}/${categorySlug}/${article.slug}`,
+      lastModified: new Date(article.updated_at),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/djeca/10-savjeta-za-bolji-san-vaseg-djeteta`,
-      lastModified: new Date('2026-01-19'),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    },
-  ]
+    }
+  })
 
-  return [...staticPages, ...categoryPages, ...articlePages]
+  return [...staticPages, ...pageUrls, ...categoryUrls, ...articleUrls]
 }

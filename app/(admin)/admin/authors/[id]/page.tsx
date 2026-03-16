@@ -10,7 +10,6 @@ import { createClient } from '@/lib/supabase/client'
 interface Author {
   id: string
   name: string
-  email: string | null
   bio: string | null
   avatar: string | null
 }
@@ -25,7 +24,6 @@ export default function EditAuthorPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [mediaOpen, setMediaOpen] = useState(false)
   const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
   const [bio, setBio] = useState('')
   const [avatar, setAvatar] = useState('')
 
@@ -35,7 +33,7 @@ export default function EditAuthorPage() {
 
       const { data } = await supabase
         .from('authors')
-        .select('id, name, email, bio, avatar')
+        .select('id, name, bio, avatar')
         .eq('id', authorId)
         .single()
 
@@ -43,7 +41,6 @@ export default function EditAuthorPage() {
         const authorData = data as Author
         setAuthor(authorData)
         setName(authorData.name || '')
-        setEmail(authorData.email || '')
         setBio(authorData.bio || '')
         setAvatar(authorData.avatar || '')
       }
@@ -88,10 +85,8 @@ export default function EditAuthorPage() {
         .from('authors')
         .update({
           name,
-          email: email || null,
           bio: bio || null,
           avatar: avatar || null,
-          updated_at: new Date().toISOString(),
         } as never)
         .eq('id', authorId)
 
@@ -120,7 +115,6 @@ export default function EditAuthorPage() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Uredi autora</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{email}</p>
           </div>
         </div>
         <Button type="submit" disabled={isLoading}>
@@ -138,14 +132,6 @@ export default function EditAuthorPage() {
               onChange={(e) => setName(e.target.value)}
               placeholder="npr. Ivan Horvat"
               required
-            />
-
-            <Input
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="ivan.horvat@matermag.hr"
             />
 
             <div>

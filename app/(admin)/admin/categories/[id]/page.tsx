@@ -1,34 +1,57 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 import { Button, Input } from '@/components/ui'
-
-// Mock categories
-const mockCategories: Record<string, {
-  name: string
-  slug: string
-  description: string
-}> = {
-  '1': { name: 'Vijesti', slug: 'vijesti', description: 'Najnovije vijesti i aktualnosti' },
-  '2': { name: 'Lifestyle', slug: 'lifestyle', description: 'Stil života i trendovi' },
-  '3': { name: 'Zdravlje', slug: 'zdravlje', description: 'Zdravlje i wellness savjeti' },
-  '4': { name: 'Recepti', slug: 'recepti', description: 'Ukusni recepti za cijelu obitelj' },
-  '5': { name: 'Djeca', slug: 'djeca', description: 'Savjeti za roditelje i djecu' },
-}
+import type { Category } from '@/types/database'
 
 export default function EditCategoryPage() {
   const router = useRouter()
   const params = useParams()
   const categoryId = params.id as string
-
-  const category = mockCategories[categoryId]
+  const supabase = createClient()
 
   const [isLoading, setIsLoading] = useState(false)
-  const [name, setName] = useState(category?.name || '')
-  const [slug, setSlug] = useState(category?.slug || '')
-  const [description, setDescription] = useState(category?.description || '')
+  const [isFetching, setIsFetching] = useState(true)
+  const [category, setCategory] = useState<Category | null>(null)
+  const [name, setName] = useState('')
+  const [slug, setSlug] = useState('')
+  const [description, setDescription] = useState('')
+
+  // Fetch category data on mount
+  useEffect(() => {
+    async function fetchCategory() {
+      setIsFetching(true)
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('id', categoryId)
+        .single()
+
+      if (error || !data) {
+        console.error('Error fetching category:', error)
+        setCategory(null)
+      } else {
+        setCategory(data)
+        setName(data.name)
+        setSlug(data.slug)
+        setDescription(data.description || '')
+      }
+      setIsFetching(false)
+    }
+
+    fetchCategory()
+  }, [categoryId, supabase])
+
+  if (isFetching) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--admin-green-dark)]"></div>
+      </div>
+    )
+  }
 
   if (!category) {
     return (
@@ -47,8 +70,8 @@ export default function EditCategoryPage() {
 
   const handleNameChange = (value: string) => {
     setName(value)
-    // Auto-generate slug from name
-    const generatedSlug = value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    // Auto-generate slug from name if slug matches old name
+    const generatedSlug = value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9čćžšđ-]/gi, '')
     if (!slug || slug === category.slug) {
       setSlug(generatedSlug)
     }
@@ -59,8 +82,19 @@ export default function EditCategoryPage() {
     setIsLoading(true)
 
     try {
-      // TODO: Update in Supabase
-      console.log('Updating category:', categoryId, { name, slug, description })
+      const { error } = await supabase
+        .from('categories')
+        .update({
+          name,
+          slug,
+          description: description || null,
+        })
+        .eq('id', categoryId)
+
+      if (error) {
+        throw error
+      }
+
       alert('Kategorija ažurirana!')
       router.push('/admin/categories')
     } catch (error) {
