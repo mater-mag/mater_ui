@@ -88,7 +88,7 @@ export default function EditCategoryPage() {
           name,
           slug,
           description: description || null,
-        })
+        } as never)
         .eq('id', categoryId)
 
       if (error) {

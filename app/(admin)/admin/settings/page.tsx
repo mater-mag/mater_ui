@@ -60,7 +60,7 @@ Sitemap: https://matermag.hr/sitemap.xml`)
             default_og_image: defaultOgImage || null,
             google_analytics_id: googleAnalyticsId || null,
             robots_txt: robotsTxt || null,
-          })
+          } as never)
           .eq('id', settingsId)
 
         if (error) throw error
@@ -74,7 +74,7 @@ Sitemap: https://matermag.hr/sitemap.xml`)
             default_og_image: defaultOgImage || null,
             google_analytics_id: googleAnalyticsId || null,
             robots_txt: robotsTxt || null,
-          })
+          } as never)
           .select()
           .single<SEOSettings>()
 

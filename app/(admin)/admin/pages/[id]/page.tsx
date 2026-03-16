@@ -95,7 +95,7 @@ export default function EditPagePage() {
           content,
           status: publishStatus,
           seo_data: seoData,
-        })
+        } as never)
         .eq('id', pageId)
 
       if (error) {

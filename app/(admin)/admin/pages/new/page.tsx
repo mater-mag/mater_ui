@@ -40,7 +40,7 @@ export default function NewPagePage() {
           content,
           status: publishStatus,
           seo_data: seoData,
-        })
+        } as never)
 
       if (error) {
         throw error
