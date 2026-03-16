@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Input } from '@/components/ui'
+import type { SEOSettings } from '@/types/database'
 
 export default function SettingsPage() {
   const supabase = createClient()
@@ -26,7 +27,7 @@ Sitemap: https://matermag.hr/sitemap.xml`)
       const { data, error } = await supabase
         .from('seo_settings')
         .select('*')
-        .single()
+        .single<SEOSettings>()
 
       if (!error && data) {
         setSettingsId(data.id)
@@ -75,7 +76,7 @@ Sitemap: https://matermag.hr/sitemap.xml`)
             robots_txt: robotsTxt || null,
           })
           .select()
-          .single()
+          .single<SEOSettings>()
 
         if (error) throw error
         if (data) setSettingsId(data.id)

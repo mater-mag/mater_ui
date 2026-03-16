@@ -28,7 +28,7 @@ export default function EditCategoryPage() {
         .from('categories')
         .select('*')
         .eq('id', categoryId)
-        .single()
+        .single<Category>()
 
       if (error || !data) {
         console.error('Error fetching category:', error)

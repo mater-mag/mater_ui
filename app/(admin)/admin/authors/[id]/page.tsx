@@ -35,10 +35,10 @@ export default function EditAuthorPage() {
         .from('authors')
         .select('id, name, bio, avatar')
         .eq('id', authorId)
-        .single()
+        .single<Author>()
 
       if (data) {
-        const authorData = data as Author
+        const authorData = data
         setAuthor(authorData)
         setName(authorData.name || '')
         setBio(authorData.bio || '')

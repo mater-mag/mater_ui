@@ -33,7 +33,7 @@ export default function EditPagePage() {
         .from('pages')
         .select('*')
         .eq('id', pageId)
-        .single()
+        .single<Page>()
 
       if (error || !data) {
         console.error('Error fetching page:', error)
