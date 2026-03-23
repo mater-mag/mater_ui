@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createClient } from '@/lib/supabase/client'
+import { useNewsletter } from '@/hooks/useNewsletter'
 import type { Category, Author } from '@/types/database'
 
 // Register ScrollTrigger
@@ -53,8 +54,8 @@ export default function CategoryPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
-  const [newsletterEmail, setNewsletterEmail] = useState('')
   const [dataFetched, setDataFetched] = useState(false)
+  const { email: newsletterEmail, setEmail: setNewsletterEmail, status: newsletterStatus, message: newsletterMessage, subscribe: handleNewsletterSubmit } = useNewsletter()
 
   const headerRef = useRef<HTMLElement>(null)
   const izdvojenoRef = useRef<HTMLElement>(null)
@@ -227,12 +228,6 @@ export default function CategoryPage() {
     }
   }, [dataFetched])
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    alert('Hvala na prijavi!')
-    setNewsletterEmail('')
-  }
-
   // Loading state
   if (loading) {
     return (
@@ -376,29 +371,40 @@ export default function CategoryPage() {
                 Prijavite se na naš newsletter
               </p>
             </div>
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
-              <div className="w-full sm:w-64">
-                <div className="flex items-center bg-white border border-foreground/10 rounded px-4 py-3">
-                  <svg className="w-4 h-4 text-foreground/40 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <input
-                    type="email"
-                    value={newsletterEmail}
-                    onChange={(e) => setNewsletterEmail(e.target.value)}
-                    placeholder="Vaš email"
-                    className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none"
-                    required
-                  />
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-5 py-3 bg-foreground text-white text-sm font-medium rounded hover:bg-black whitespace-nowrap transition-colors"
-              >
-                Prijavi se
-              </button>
-            </form>
+            <div className="w-full md:w-auto">
+              {newsletterStatus === 'success' ? (
+                <p className="text-green-600 font-medium">{newsletterMessage}</p>
+              ) : (
+                <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
+                  <div className="w-full sm:w-64">
+                    <div className="flex items-center bg-white border border-foreground/10 rounded px-4 py-3">
+                      <svg className="w-4 h-4 text-foreground/40 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                      </svg>
+                      <input
+                        type="email"
+                        value={newsletterEmail}
+                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                        placeholder="Vaš email"
+                        className="flex-1 bg-transparent text-sm text-foreground placeholder:text-foreground/40 focus:outline-none"
+                        required
+                        disabled={newsletterStatus === 'loading'}
+                      />
+                    </div>
+                    {newsletterStatus === 'error' && (
+                      <p className="text-red-500 text-xs mt-1">{newsletterMessage}</p>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={newsletterStatus === 'loading'}
+                    className="w-full sm:w-auto px-5 py-3 bg-foreground text-white text-sm font-medium rounded hover:bg-black whitespace-nowrap transition-colors disabled:opacity-50"
+                  >
+                    {newsletterStatus === 'loading' ? 'Prijava...' : 'Prijavi se'}
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </section>
