@@ -139,9 +139,9 @@ export default function EditPagePage() {
             Spremi kao skicu
           </Button>
           <Button
-            type="submit"
+            type="button"
             disabled={isLoading}
-            onClick={() => setStatus('published')}
+            onClick={(e) => handleSubmit(e as React.FormEvent, 'published')}
           >
             {isLoading ? 'Spremanje...' : 'Objavi'}
           </Button>

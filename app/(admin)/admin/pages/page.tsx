@@ -75,7 +75,7 @@ export default async function PagesPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-3">
                       <a
-                        href={`/${page.slug}`}
+                        href={`/page/${page.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm font-medium text-gray-400 hover:text-gray-600"
