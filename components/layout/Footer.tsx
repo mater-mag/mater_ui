@@ -165,7 +165,7 @@ export function Footer({ categories = [] }: FooterProps) {
               </li>
               <li>
                 <Link
-                  href="/page/uvijeti-koristenja"
+                  href="/page/uvjeti-koristenja"
                   className="text-sm uppercase tracking-wide hover:text-coral transition-colors"
                 >
                   UVJETI KORIŠTENJA

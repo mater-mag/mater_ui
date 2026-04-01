@@ -5,7 +5,6 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 
-// Popular search tags
 const popularTags = [
   'zdravaprehrana',
   'mastitis',
@@ -16,66 +15,16 @@ const popularTags = [
   'lifestyle',
 ]
 
-// Mock search results
 interface SearchResult {
   id: string
   title: string
   slug: string
-  category: string
-  categorySlug: string
-  image: string
+  excerpt: string | null
+  featured_image: string | null
+  category: string | null
+  categorySlug: string | null
+  published_at: string | null
 }
-
-const mockAllResults: SearchResult[] = [
-  {
-    id: '1',
-    title: 'SIDS: Što je sindrom iznenadne dojenačke smrti i kako ga prevenirati?',
-    slug: 'sids-sto-je-sindrom-iznenadne-dojenacke-smrti',
-    category: 'Zdravlje',
-    categorySlug: 'zdravlje',
-    image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=600&h=400&fit=crop',
-  },
-  {
-    id: '2',
-    title: 'Zašto djeca obožavaju Peppa Pig crtani film? Otkrivamo tajnu svjetskog fenomena',
-    slug: 'zasto-djeca-obozavaju-peppa-pig',
-    category: 'Djeca',
-    categorySlug: 'djeca',
-    image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=600&h=400&fit=crop',
-  },
-  {
-    id: '3',
-    title: 'Putovanje s bebom: Kada je sigurno i kako se najbolje pripremiti?',
-    slug: 'putovanje-s-bebom-kada-je-sigurno',
-    category: 'Lifestyle',
-    categorySlug: 'lifestyle',
-    image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&h=400&fit=crop',
-  },
-  {
-    id: '4',
-    title: 'Mastitis: Simptomi, uzroci i kako se liječiti kod kuće',
-    slug: 'mastitis-simptomi-uzroci-lijecenje',
-    category: 'Zdravlje',
-    categorySlug: 'zdravlje',
-    image: 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=600&h=400&fit=crop',
-  },
-  {
-    id: '5',
-    title: 'Kako prepoznati i liječiti mastitis tijekom dojenja',
-    slug: 'kako-prepoznati-lijeciti-mastitis-dojenje',
-    category: 'Zdravlje',
-    categorySlug: 'zdravlje',
-    image: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=600&h=400&fit=crop',
-  },
-  {
-    id: '6',
-    title: 'Prevencija mastitisa: Savjeti za zdrave dojke',
-    slug: 'prevencija-mastitisa-savjeti',
-    category: 'Zdravlje',
-    categorySlug: 'zdravlje',
-    image: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&h=400&fit=crop',
-  },
-]
 
 function SearchContent() {
   const searchParams = useSearchParams()
@@ -84,19 +33,28 @@ function SearchContent() {
 
   const [query, setQuery] = useState(queryParam)
   const [results, setResults] = useState<SearchResult[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(!!queryParam)
 
   // Search when query param changes
   useEffect(() => {
     if (queryParam) {
-      const filtered = mockAllResults.filter(
-        (article) =>
-          article.title.toLowerCase().includes(queryParam.toLowerCase()) ||
-          article.category.toLowerCase().includes(queryParam.toLowerCase())
-      )
-      setResults(filtered)
-      setHasSearched(true)
+      setIsLoading(true)
       setQuery(queryParam)
+
+      fetch(`/api/search?q=${encodeURIComponent(queryParam)}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setResults(data.results || [])
+          setHasSearched(true)
+        })
+        .catch((error) => {
+          console.error('Search error:', error)
+          setResults([])
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
     }
   }, [queryParam])
 
@@ -115,6 +73,19 @@ function SearchContent() {
     setQuery('')
     setResults([])
     setHasSearched(false)
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="py-16 lg:py-24">
+        <div className="container">
+          <div className="flex items-center justify-center min-h-[40vh]">
+            <div className="animate-pulse text-gray-400">Pretraživanje...</div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   // Results view
@@ -143,20 +114,30 @@ function SearchContent() {
             {results.map((article) => (
               <Link
                 key={article.id}
-                href={`/${article.categorySlug}/${article.slug}`}
+                href={article.categorySlug ? `/${article.categorySlug}/${article.slug}` : `/${article.slug}`}
                 className="group"
               >
                 <div className="aspect-[3/2] relative bg-gray-100 rounded-lg overflow-hidden mb-4">
-                  <Image
-                    src={article.image}
-                    alt={article.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  {article.featured_image ? (
+                    <Image
+                      src={article.featured_image}
+                      alt={article.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                      <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">
-                  {article.category}
-                </p>
+                {article.category && (
+                  <p className="text-xs font-medium uppercase tracking-wider text-gray-400 mb-2">
+                    {article.category}
+                  </p>
+                )}
                 <h3 className="font-serif text-lg leading-snug group-hover:text-coral transition-colors">
                   {article.title}
                 </h3>
