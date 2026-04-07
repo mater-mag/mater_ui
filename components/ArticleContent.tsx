@@ -15,6 +15,30 @@ export function ArticleContent({ content, className = '' }: ArticleContentProps)
 
     // Check if content has Instagram embeds
     if (content.includes('instagram-media') || content.includes('data-instagram-embed')) {
+      const windowWithInstgrm = window as unknown as { instgrm?: { Embeds: { process: () => void } } }
+
+      // Fix empty blockquotes before processing - Instagram requires content inside
+      const fixEmptyBlockquotes = () => {
+        if (!contentRef.current) return
+        const blockquotes = contentRef.current.querySelectorAll('blockquote.instagram-media')
+        blockquotes.forEach((blockquote) => {
+          if (!blockquote.innerHTML.trim()) {
+            const url = blockquote.getAttribute('data-instgrm-permalink') || ''
+            blockquote.innerHTML = `<div style="padding:16px;"><a href="${url}" style="background:#FFFFFF; line-height:0; padding:0; text-align:center; text-decoration:none; width:100%;" target="_blank">View this post on Instagram</a></div>`
+          }
+        })
+      }
+
+      // If Instagram script is already loaded, just reprocess embeds
+      if (windowWithInstgrm.instgrm) {
+        // Small delay to ensure DOM is updated
+        setTimeout(() => {
+          fixEmptyBlockquotes()
+          windowWithInstgrm.instgrm?.Embeds.process()
+        }, 100)
+        return
+      }
+
       // Load Instagram embed script
       const script = document.createElement('script')
       script.src = 'https://www.instagram.com/embed.js'
@@ -23,8 +47,9 @@ export function ArticleContent({ content, className = '' }: ArticleContentProps)
 
       // Process embeds when script loads
       script.onload = () => {
-        if ((window as unknown as { instgrm?: { Embeds: { process: () => void } } }).instgrm) {
-          (window as unknown as { instgrm: { Embeds: { process: () => void } } }).instgrm.Embeds.process()
+        fixEmptyBlockquotes()
+        if (windowWithInstgrm.instgrm) {
+          windowWithInstgrm.instgrm.Embeds.process()
         }
       }
 

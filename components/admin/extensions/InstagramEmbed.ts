@@ -53,9 +53,19 @@ export const InstagramEmbed = Node.create<InstagramEmbedOptions>({
     return {
       url: {
         default: null,
+        parseHTML: element => element.getAttribute('data-url'),
+        renderHTML: attributes => {
+          if (!attributes.url) return {}
+          return { 'data-url': attributes.url }
+        },
       },
       postId: {
         default: null,
+        parseHTML: element => element.getAttribute('data-post-id'),
+        renderHTML: attributes => {
+          if (!attributes.postId) return {}
+          return { 'data-post-id': attributes.postId }
+        },
       },
     }
   },
@@ -71,6 +81,7 @@ export const InstagramEmbed = Node.create<InstagramEmbedOptions>({
   renderHTML({ HTMLAttributes }) {
     const url = HTMLAttributes.url || ''
     const postId = HTMLAttributes.postId || extractInstagramId(url)
+    const permalinkUrl = url ? `${url}?utm_source=ig_embed` : ''
 
     return [
       'div',
@@ -84,10 +95,23 @@ export const InstagramEmbed = Node.create<InstagramEmbedOptions>({
         'blockquote',
         {
           class: 'instagram-media',
-          'data-instgrm-permalink': url,
+          'data-instgrm-permalink': permalinkUrl,
           'data-instgrm-version': '14',
           style: 'background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:540px; min-width:326px; padding:0; width:calc(100% - 2px);',
         },
+        [
+          'div',
+          { style: 'padding:16px;' },
+          [
+            'a',
+            {
+              href: permalinkUrl,
+              style: 'background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;',
+              target: '_blank',
+            },
+            'View this post on Instagram',
+          ],
+        ],
       ],
     ]
   },
