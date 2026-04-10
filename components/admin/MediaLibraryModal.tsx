@@ -14,45 +14,76 @@ interface MediaLibraryModalProps {
   onSelectMultiple?: (media: Media[]) => void
 }
 
+const PAGE_SIZE = 50
+
 export function MediaLibraryModal({ open, onClose, onSelect, multiple, onSelectMultiple }: MediaLibraryModalProps) {
   const [media, setMedia] = useState<Media[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [totalCount, setTotalCount] = useState(0)
   const [selected, setSelected] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const fetchMedia = useCallback(async () => {
-    setLoading(true)
+  const fetchMedia = useCallback(async (loadMore = false) => {
+    if (loadMore) {
+      setLoadingMore(true)
+    } else {
+      setLoading(true)
+    }
+
     try {
       const supabase = createClient()
+      const offset = loadMore ? media.length : 0
+
+      // Get total count on initial load
+      if (!loadMore) {
+        const { count } = await supabase
+          .from('media')
+          .select('*', { count: 'exact', head: true })
+        setTotalCount(count || 0)
+      }
+
       const { data, error } = await supabase
         .from('media')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(50)
+        .range(offset, offset + PAGE_SIZE - 1)
 
       if (error) {
         console.error('Error fetching media:', error)
-        setMedia([])
+        if (!loadMore) setMedia([])
       } else {
-        setMedia((data || []) as Media[])
+        const newData = (data || []) as Media[]
+        if (loadMore) {
+          setMedia(prev => [...prev, ...newData])
+        } else {
+          setMedia(newData)
+        }
+        setHasMore(newData.length === PAGE_SIZE)
       }
     } catch (err) {
       console.error('Error fetching media:', err)
-      setMedia([])
+      if (!loadMore) setMedia([])
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
-  }, [])
+  }, [media.length])
 
   useEffect(() => {
     if (open) {
-      fetchMedia()
+      // Reset state and fetch fresh data when modal opens
+      setMedia([])
+      setHasMore(true)
       setSelected([])
       setUploadError(null)
+      fetchMedia(false)
     }
-  }, [open, fetchMedia])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   // Close on Escape
   useEffect(() => {
@@ -297,6 +328,32 @@ export function MediaLibraryModal({ open, onClose, onSelect, multiple, onSelectM
               })}
             </div>
           )}
+
+          {/* Load more button */}
+          {!loading && hasMore && media.length > 0 && (
+            <div className="flex justify-center mt-6">
+              <button
+                type="button"
+                onClick={() => fetchMedia(true)}
+                disabled={loadingMore}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                {loadingMore ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                    Učitavanje...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    Učitaj više
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -304,7 +361,9 @@ export function MediaLibraryModal({ open, onClose, onSelect, multiple, onSelectM
           <p className="text-sm text-gray-500">
             {selected.length > 0
               ? `${selected.length} odabrano`
-              : `${media.length} datoteka`}
+              : totalCount > 0
+                ? `Prikazano ${media.length} od ${totalCount} datoteka`
+                : `${media.length} datoteka`}
           </p>
           <div className="flex gap-3">
             <button

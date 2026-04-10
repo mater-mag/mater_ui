@@ -78,9 +78,12 @@ export const InstagramEmbed = Node.create<InstagramEmbedOptions>({
     ]
   },
 
-  renderHTML({ HTMLAttributes }) {
-    const url = HTMLAttributes.url || ''
-    const postId = HTMLAttributes.postId || extractInstagramId(url)
+  renderHTML({ node, HTMLAttributes }) {
+    // Access attributes from node.attrs, not HTMLAttributes
+    // HTMLAttributes contains the merged HTML attrs (data-url, data-post-id)
+    // but we need the original node attrs (url, postId)
+    const url = node.attrs.url || ''
+    const postId = node.attrs.postId || extractInstagramId(url)
     const permalinkUrl = url ? `${url}?utm_source=ig_embed` : ''
 
     return [
