@@ -61,10 +61,10 @@ export function PopularnoSlider({ articles, showDivider = true }: PopularnoSlide
                 {/* Overlay with title */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-                  <p className="text-xs uppercase tracking-wider text-white/70 mb-2">
+                  <p className="text-sm uppercase tracking-wider text-white/70 mb-2">
                     {article.category?.name}
                   </p>
-                  <h2 className="font-serif text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-3xl" style={{ paddingBottom: '5rem' }}>
+                  <h2 className="font-serif text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight max-w-3xl" style={{ paddingBottom: '5rem' }}>
                     {article.title}
                   </h2>
                 </div>
