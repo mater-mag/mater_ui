@@ -119,7 +119,7 @@ export function HeroCarousel({ articles }: HeroCarouselProps) {
   if (articles.length === 0) return null
 
   return (
-    <div className="container pb-16 animate-in">
+    <div className="container pb-0 animate-in">
       <div ref={sliderRef} className="relative overflow-hidden">
         {/* Slides */}
         <div
@@ -145,7 +145,7 @@ export function HeroCarousel({ articles }: HeroCarouselProps) {
                   <p className="text-xs uppercase tracking-wider text-white/70 mb-2">
                     {slide.category?.name}
                   </p>
-                  <h2 className="font-serif text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-3xl">
+                  <h2 className="font-serif text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-3xl" style={{ paddingBottom: '5rem' }}>
                     {slide.title}
                   </h2>
                 </div>

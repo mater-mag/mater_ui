@@ -64,7 +64,7 @@ export function PopularnoSlider({ articles, showDivider = true }: PopularnoSlide
                   <p className="text-xs uppercase tracking-wider text-white/70 mb-2">
                     {article.category?.name}
                   </p>
-                  <h2 className="font-serif text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-3xl">
+                  <h2 className="font-serif text-xl md:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-3xl" style={{ paddingBottom: '5rem' }}>
                     {article.title}
                   </h2>
                 </div>
