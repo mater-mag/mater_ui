@@ -22,7 +22,7 @@ export function IntervjuTjedna({ featured, grid }: IntervjuTjednaProps) {
         {/* Left - Image/Video - matches hero slider height */}
         <div className="animate-in">
           {featured.media_type === 'video' && featured.featured_video ? (
-            <div className="aspect-[4/5] lg:aspect-[1/1] relative overflow-hidden rounded-sm bg-black">
+            <div className="aspect-[2/3] lg:aspect-[1/1] relative overflow-hidden rounded-sm bg-black">
               <VideoPlayer
                 videoUrl={featured.featured_video}
                 title={featured.title}
@@ -34,7 +34,7 @@ export function IntervjuTjedna({ featured, grid }: IntervjuTjednaProps) {
             </div>
           ) : (
             <Link href={`/${featured.category?.slug || 'intervjui'}/${featured.slug}`} className="block group">
-              <div className="aspect-[4/5] lg:aspect-[1/1] relative overflow-hidden rounded-sm">
+              <div className="aspect-[2/3] lg:aspect-[1/1] relative overflow-hidden rounded-sm">
                 <Image
                   src={featured.featured_image || placeholderImage}
                   alt={featured.title}
@@ -73,7 +73,7 @@ export function IntervjuTjedna({ featured, grid }: IntervjuTjednaProps) {
             {grid.map((article) => (
               <article key={article.id} className="group animate-in">
                 <Link href={`/${article.category?.slug || 'intervjui'}/${article.slug}`}>
-                  <div className="aspect-[4/5] relative overflow-hidden mb-4">
+                  <div className="aspect-[2/3] relative overflow-hidden mb-4">
                     <Image
                       src={article.featured_image || placeholderImage}
                       alt={article.title}

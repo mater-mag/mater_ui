@@ -17,12 +17,9 @@ export function HeroBranding() {
       </div>
 
       {/* Hero Tagline */}
-      <div className="container flex flex-col md:flex-row md:items-end md:justify-between gap-4 animate-in">
+      <div className="container animate-in">
         <p className="font-serif text-xl md:text-2xl text-foreground max-w-md">
           Inspirirajte svoj <em className="not-italic text-coral">obiteljski život</em>
-        </p>
-        <p className="text-sm text-foreground/50 uppercase tracking-wider">
-          Portal za moderne mame
         </p>
       </div>
     </section>

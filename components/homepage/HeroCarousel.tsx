@@ -101,14 +101,6 @@ export function HeroCarousel({ articles }: HeroCarouselProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const sliderRef = useRef<HTMLDivElement>(null)
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % articles.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + articles.length) % articles.length)
-  }
-
   const goToSlide = (index: number) => {
     setCurrentSlide(index)
   }
@@ -140,7 +132,7 @@ export function HeroCarousel({ articles }: HeroCarouselProps) {
               href={`/${slide.category?.slug || 'vijesti'}/${slide.slug}`}
               className="block group w-full flex-shrink-0"
             >
-              <div className="aspect-[4/5] md:aspect-[2/1] relative overflow-hidden">
+              <div className="aspect-[2/3] md:aspect-[2/1] relative overflow-hidden">
                 <ArticleMedia
                   article={slide}
                   sizes="100vw"
@@ -161,30 +153,6 @@ export function HeroCarousel({ articles }: HeroCarouselProps) {
             </Link>
           ))}
         </div>
-
-        {/* Navigation Arrows */}
-        {articles.length > 1 && (
-          <>
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20 transition-colors"
-              aria-label="Previous slide"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center bg-white/10 backdrop-blur border border-white/20 text-white hover:bg-white/20 transition-colors"
-              aria-label="Next slide"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </>
-        )}
 
         {/* Dot indicators */}
         {articles.length > 1 && (
