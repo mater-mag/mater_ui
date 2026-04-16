@@ -31,7 +31,8 @@ export default function NewArticlePage() {
   const [slug, setSlug] = useState('')
   const [content, setContent] = useState('')
   const [excerpt, setExcerpt] = useState('')
-  const [featuredImage, setFeaturedImage] = useState('')
+  const [desktopImage, setDesktopImage] = useState('')
+  const [mobileImage, setMobileImage] = useState('')
   const [featuredVideo, setFeaturedVideo] = useState('')
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image')
   const [parentCategoryId, setParentCategoryId] = useState('')
@@ -40,6 +41,7 @@ export default function NewArticlePage() {
   const [status, setStatus] = useState<'draft' | 'published'>('draft')
   const [seoData, setSeoData] = useState<SEOData>({})
   const [mediaOpen, setMediaOpen] = useState(false)
+  const [activeImageField, setActiveImageField] = useState<'desktop' | 'mobile'>('desktop')
 
   useEffect(() => {
     async function fetchData() {
@@ -102,7 +104,9 @@ export default function NewArticlePage() {
         slug,
         content,
         excerpt,
-        featured_image: featuredImage || null,
+        featured_image: desktopImage || null,
+        featured_image_desktop: desktopImage || null,
+        featured_image_mobile: mobileImage || null,
         featured_video: featuredVideo || null,
         media_type: mediaType,
         category_id: finalCategoryId,
@@ -230,30 +234,71 @@ export default function NewArticlePage() {
             </div>
 
             {mediaType === 'image' ? (
-              <>
-                <Input
-                  value={featuredImage}
-                  onChange={(e) => setFeaturedImage(e.target.value)}
-                  placeholder="URL slike"
-                />
-                {featuredImage && (
-                  <div className="mt-4 aspect-video relative rounded-lg overflow-hidden bg-muted">
-                    <img
-                      src={featuredImage}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full mt-4"
-                  onClick={() => setMediaOpen(true)}
-                >
-                  Odaberi iz medijateke
-                </Button>
-              </>
+              <div className="space-y-6">
+                {/* Desktop Image */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Desktop slika
+                  </label>
+                  <Input
+                    value={desktopImage}
+                    onChange={(e) => setDesktopImage(e.target.value)}
+                    placeholder="URL slike za desktop"
+                  />
+                  {desktopImage && (
+                    <div className="mt-2 aspect-video relative rounded-lg overflow-hidden bg-muted">
+                      <img
+                        src={desktopImage}
+                        alt="Desktop preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={() => {
+                      setActiveImageField('desktop')
+                      setMediaOpen(true)
+                    }}
+                  >
+                    Odaberi iz medijateke
+                  </Button>
+                </div>
+
+                {/* Mobile Image */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Mobilna slika
+                  </label>
+                  <Input
+                    value={mobileImage}
+                    onChange={(e) => setMobileImage(e.target.value)}
+                    placeholder="URL slike za mobitel"
+                  />
+                  {mobileImage && (
+                    <div className="mt-2 aspect-[9/16] max-w-[200px] relative rounded-lg overflow-hidden bg-muted">
+                      <img
+                        src={mobileImage}
+                        alt="Mobile preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={() => {
+                      setActiveImageField('mobile')
+                      setMediaOpen(true)
+                    }}
+                  >
+                    Odaberi iz medijateke
+                  </Button>
+                </div>
+              </div>
             ) : (
               <>
                 <Input
@@ -367,7 +412,11 @@ export default function NewArticlePage() {
             setFeaturedVideo(media.url)
             setMediaType('video')
           } else {
-            setFeaturedImage(media.url)
+            if (activeImageField === 'desktop') {
+              setDesktopImage(media.url)
+            } else {
+              setMobileImage(media.url)
+            }
             setMediaType('image')
           }
         }}

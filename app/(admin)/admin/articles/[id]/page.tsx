@@ -29,6 +29,8 @@ interface ArticleData {
   content: string | null
   excerpt: string | null
   featured_image: string | null
+  featured_image_desktop: string | null
+  featured_image_mobile: string | null
   featured_video: string | null
   media_type: 'image' | 'video'
   category_id: string | null
@@ -53,7 +55,8 @@ export default function EditArticlePage() {
   const [slug, setSlug] = useState('')
   const [content, setContent] = useState('')
   const [excerpt, setExcerpt] = useState('')
-  const [featuredImage, setFeaturedImage] = useState('')
+  const [desktopImage, setDesktopImage] = useState('')
+  const [mobileImage, setMobileImage] = useState('')
   const [featuredVideo, setFeaturedVideo] = useState('')
   const [mediaType, setMediaType] = useState<'image' | 'video'>('image')
   const [parentCategoryId, setParentCategoryId] = useState('')
@@ -61,6 +64,7 @@ export default function EditArticlePage() {
   const [authorId, setAuthorId] = useState('')
   const [status, setStatus] = useState<'draft' | 'published'>('draft')
   const [seoData, setSeoData] = useState<SEOData>({})
+  const [activeImageField, setActiveImageField] = useState<'desktop' | 'mobile'>('desktop')
 
   useEffect(() => {
     async function fetchData() {
@@ -69,7 +73,7 @@ export default function EditArticlePage() {
       // Fetch the article
       const { data: articleData } = await supabase
         .from('articles')
-        .select('id, title, slug, content, excerpt, featured_image, featured_video, media_type, category_id, author_id, status, seo_data')
+        .select('id, title, slug, content, excerpt, featured_image, featured_image_desktop, featured_image_mobile, featured_video, media_type, category_id, author_id, status, seo_data')
         .eq('id', articleId)
         .single()
 
@@ -99,7 +103,8 @@ export default function EditArticlePage() {
         setSlug(art.slug || '')
         setContent(art.content || '')
         setExcerpt(art.excerpt || '')
-        setFeaturedImage(art.featured_image || '')
+        setDesktopImage(art.featured_image_desktop || art.featured_image || '')
+        setMobileImage(art.featured_image_mobile || '')
         setFeaturedVideo(art.featured_video || '')
         setMediaType(art.media_type || 'image')
         setAuthorId(art.author_id || '')
@@ -186,7 +191,9 @@ export default function EditArticlePage() {
           slug,
           content,
           excerpt,
-          featured_image: featuredImage || null,
+          featured_image: desktopImage || null,
+          featured_image_desktop: desktopImage || null,
+          featured_image_mobile: mobileImage || null,
           featured_video: featuredVideo || null,
           media_type: mediaType,
           category_id: finalCategoryId,
@@ -343,30 +350,71 @@ export default function EditArticlePage() {
             </div>
 
             {mediaType === 'image' ? (
-              <>
-                <Input
-                  value={featuredImage}
-                  onChange={(e) => setFeaturedImage(e.target.value)}
-                  placeholder="URL slike"
-                />
-                {featuredImage && (
-                  <div className="mt-4 aspect-video relative rounded-lg overflow-hidden bg-muted">
-                    <img
-                      src={featuredImage}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full mt-4"
-                  onClick={() => setMediaOpen(true)}
-                >
-                  Odaberi iz medijateke
-                </Button>
-              </>
+              <div className="space-y-6">
+                {/* Desktop Image */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Desktop slika
+                  </label>
+                  <Input
+                    value={desktopImage}
+                    onChange={(e) => setDesktopImage(e.target.value)}
+                    placeholder="URL slike za desktop"
+                  />
+                  {desktopImage && (
+                    <div className="mt-2 aspect-video relative rounded-lg overflow-hidden bg-muted">
+                      <img
+                        src={desktopImage}
+                        alt="Desktop preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={() => {
+                      setActiveImageField('desktop')
+                      setMediaOpen(true)
+                    }}
+                  >
+                    Odaberi iz medijateke
+                  </Button>
+                </div>
+
+                {/* Mobile Image */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Mobilna slika
+                  </label>
+                  <Input
+                    value={mobileImage}
+                    onChange={(e) => setMobileImage(e.target.value)}
+                    placeholder="URL slike za mobitel"
+                  />
+                  {mobileImage && (
+                    <div className="mt-2 aspect-[9/16] max-w-[200px] relative rounded-lg overflow-hidden bg-muted">
+                      <img
+                        src={mobileImage}
+                        alt="Mobile preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-2"
+                    onClick={() => {
+                      setActiveImageField('mobile')
+                      setMediaOpen(true)
+                    }}
+                  >
+                    Odaberi iz medijateke
+                  </Button>
+                </div>
+              </div>
             ) : (
               <>
                 <Input
@@ -480,7 +528,11 @@ export default function EditArticlePage() {
             setFeaturedVideo(media.url)
             setMediaType('video')
           } else {
-            setFeaturedImage(media.url)
+            if (activeImageField === 'desktop') {
+              setDesktopImage(media.url)
+            } else {
+              setMobileImage(media.url)
+            }
             setMediaType('image')
           }
         }}

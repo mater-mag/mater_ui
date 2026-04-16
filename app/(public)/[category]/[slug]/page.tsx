@@ -9,6 +9,7 @@ import { hr } from 'date-fns/locale'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createClient } from '@/lib/supabase/client'
+import { ResponsiveImage } from '@/components/ui'
 import type { Category, Author } from '@/types/database'
 
 // Register ScrollTrigger
@@ -23,6 +24,8 @@ interface ArticleWithRelations {
   content: string
   excerpt: string | null
   featured_image: string | null
+  featured_image_desktop: string | null
+  featured_image_mobile: string | null
   featured_video: string | null
   media_type: 'image' | 'video'
   category_id: string | null
@@ -383,16 +386,18 @@ export default function ArticlePage() {
                 <VideoPlayer videoUrl={article.featured_video} title={article.title} />
               </div>
             </figure>
-          ) : article.featured_image && (
+          ) : (article.featured_image_desktop || article.featured_image) && (
             <figure className="mb-8">
               <div className="aspect-[16/10] relative rounded-lg overflow-hidden">
-                <Image
-                  src={article.featured_image || placeholderImage}
+                <ResponsiveImage
+                  desktopSrc={article.featured_image_desktop || article.featured_image}
+                  mobileSrc={article.featured_image_mobile}
                   alt={article.title}
                   fill
                   className="object-cover"
                   priority
                   sizes="(max-width: 768px) 100vw, 896px"
+                  fallbackSrc={placeholderImage}
                 />
               </div>
             </figure>
@@ -487,12 +492,14 @@ export default function ArticlePage() {
               <article key={relatedArticle.id} className="group">
                 <Link href={`/${relatedArticle.category?.slug || categorySlug}/${relatedArticle.slug}`}>
                   <div className="aspect-[4/3] relative rounded-lg overflow-hidden mb-4 img-hover">
-                    <Image
-                      src={relatedArticle.featured_image || placeholderImage}
+                    <ResponsiveImage
+                      desktopSrc={relatedArticle.featured_image_desktop || relatedArticle.featured_image}
+                      mobileSrc={relatedArticle.featured_image_mobile}
                       alt={relatedArticle.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      fallbackSrc={placeholderImage}
                     />
                   </div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">{relatedArticle.category?.name || 'Članak'}</p>

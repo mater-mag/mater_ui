@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { ResponsiveImage } from '@/components/ui'
 import type { ArticleWithRelations } from '@/lib/supabase/homepage-queries'
 
 const placeholderImage = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1920&q=80'
@@ -86,13 +87,15 @@ function ArticleMedia({
   }
 
   return (
-    <Image
-      src={article.featured_image || placeholderImage}
+    <ResponsiveImage
+      desktopSrc={article.featured_image_desktop || article.featured_image}
+      mobileSrc={article.featured_image_mobile}
       alt={article.title}
       fill
       className={`object-cover ${className}`}
       priority={priority}
       sizes={sizes}
+      fallbackSrc={placeholderImage}
     />
   )
 }

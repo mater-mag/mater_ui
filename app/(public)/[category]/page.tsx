@@ -8,6 +8,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createClient } from '@/lib/supabase/client'
 import { useNewsletter } from '@/hooks/useNewsletter'
+import { ResponsiveImage } from '@/components/ui'
 import type { Category, Author } from '@/types/database'
 
 // Register ScrollTrigger
@@ -22,6 +23,8 @@ interface ArticleWithRelations {
   content: string
   excerpt: string | null
   featured_image: string | null
+  featured_image_desktop: string | null
+  featured_image_mobile: string | null
   category_id: string | null
   author_id: string | null
   status: 'draft' | 'published' | 'archived'
@@ -309,12 +312,14 @@ export default function CategoryPage() {
               <article className="group">
                 <Link href={`/${featuredArticle.category?.slug || categorySlug}/${featuredArticle.slug}`}>
                   <div className="aspect-[16/10] relative rounded-lg overflow-hidden mb-4 img-hover">
-                    <Image
-                      src={featuredArticle.featured_image || placeholderImage}
+                    <ResponsiveImage
+                      desktopSrc={featuredArticle.featured_image_desktop || featuredArticle.featured_image}
+                      mobileSrc={featuredArticle.featured_image_mobile}
                       alt={featuredArticle.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 66vw"
+                      fallbackSrc={placeholderImage}
                     />
                   </div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">{featuredArticle.category?.name || category.name}</p>
@@ -334,12 +339,14 @@ export default function CategoryPage() {
                 <article key={article.id} className="group">
                   <Link href={`/${article.category?.slug || categorySlug}/${article.slug}`} className="flex gap-4">
                     <div className="w-24 h-24 relative rounded-lg overflow-hidden shrink-0 img-hover">
-                      <Image
-                        src={article.featured_image || placeholderImage}
+                      <ResponsiveImage
+                        desktopSrc={article.featured_image_desktop || article.featured_image}
+                        mobileSrc={article.featured_image_mobile}
                         alt={article.title}
                         fill
                         className="object-cover"
                         sizes="96px"
+                        fallbackSrc={placeholderImage}
                       />
                     </div>
                     <div className="flex flex-col justify-center">
@@ -422,12 +429,14 @@ export default function CategoryPage() {
                 <article key={article.id} className="group">
                   <Link href={`/${article.category?.slug || categorySlug}/${article.slug}`}>
                     <div className="aspect-[4/3] relative rounded-lg overflow-hidden mb-4 img-hover">
-                      <Image
-                        src={article.featured_image || placeholderImage}
+                      <ResponsiveImage
+                        desktopSrc={article.featured_image_desktop || article.featured_image}
+                        mobileSrc={article.featured_image_mobile}
                         alt={article.title}
                         fill
                         className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        fallbackSrc={placeholderImage}
                       />
                     </div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">{article.category?.name || category.name}</p>

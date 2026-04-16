@@ -5,6 +5,8 @@ export interface Article {
   content: string
   excerpt: string | null
   featured_image: string | null
+  featured_image_desktop: string | null
+  featured_image_mobile: string | null
   featured_video: string | null
   media_type: 'image' | 'video'
   category_id: string | null

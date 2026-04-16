@@ -6,7 +6,7 @@ export function NewsletterSection() {
   const { email, setEmail, status, message, subscribe } = useNewsletter()
 
   return (
-    <section className="bg-coral-light py-16 md:py-24">
+    <section className="bg-coral-light mt-16 md:mt-24 py-16 md:py-24">
       <div className="container">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="animate-in">

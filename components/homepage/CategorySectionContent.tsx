@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { createClient } from '@/lib/supabase/client'
+import { ResponsiveImage } from '@/components/ui'
 import type { Category } from '@/types/database'
 import type { ArticleWithRelations } from '@/lib/supabase/homepage-queries'
 
@@ -88,7 +88,7 @@ export function CategorySectionContent({ category, limit = 6 }: CategorySectionC
 
   if (loading) {
     return (
-      <section className="container py-16 md:py-24">
+      <section className="container pt-16 md:pt-24">
         <div className="mb-10">
           <div className="h-8 w-48 bg-foreground/10 rounded animate-pulse mb-4"></div>
           <div className="w-full h-px bg-foreground/10"></div>
@@ -110,7 +110,7 @@ export function CategorySectionContent({ category, limit = 6 }: CategorySectionC
   if (articles.length === 0) return null
 
   return (
-    <section ref={sectionRef} className="container py-16 md:py-24">
+    <section ref={sectionRef} className="container pt-16 md:pt-24">
       {/* Section Header */}
       <div className="animate-in mb-10">
         <div className="flex items-end justify-between mb-4">
@@ -131,12 +131,14 @@ export function CategorySectionContent({ category, limit = 6 }: CategorySectionC
           <article key={article.id} className="group animate-in">
             <Link href={`/${article.category?.slug || category.slug}/${article.slug}`}>
               <div className="aspect-[4/3] relative overflow-hidden mb-4">
-                <Image
-                  src={article.featured_image || placeholderImage}
+                <ResponsiveImage
+                  desktopSrc={article.featured_image_desktop || article.featured_image}
+                  mobileSrc={article.featured_image_mobile}
                   alt={article.title}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 33vw"
+                  fallbackSrc={placeholderImage}
                 />
               </div>
               <p className="text-[11px] uppercase tracking-wider text-coral font-medium mb-2">

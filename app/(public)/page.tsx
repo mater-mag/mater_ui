@@ -35,7 +35,7 @@ export default async function HomePage() {
     })
 
   return (
-    <main className="bg-background">
+    <main className="bg-background pb-16 md:pb-24">
       {/* Hero Section */}
       <AnimatedSection>
         <HeroBranding />

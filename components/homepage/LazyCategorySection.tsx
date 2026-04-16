@@ -11,7 +11,7 @@ interface LazyCategorySectionProps {
 
 function CategorySkeleton() {
   return (
-    <section className="container py-16 md:py-24">
+    <section className="container pt-16 md:pt-24">
       {/* Header skeleton */}
       <div className="mb-10">
         <div className="h-8 w-48 bg-foreground/10 rounded animate-pulse mb-4"></div>

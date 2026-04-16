@@ -1,7 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { SectionHeader } from './SectionHeader'
 import { VideoPlayer } from './VideoPlayer'
+import { ResponsiveImage } from '@/components/ui'
 import type { ArticleWithRelations } from '@/lib/supabase/homepage-queries'
 
 const placeholderImage = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1920&q=80'
@@ -15,8 +15,8 @@ export function IntervjuTjedna({ featured, grid }: IntervjuTjednaProps) {
   if (!featured) return null
 
   return (
-    <section className="container py-16 md:py-24">
-      <SectionHeader title="Intervju tjedna/mjeseca" />
+    <section className="container pt-16 md:pt-24">
+      <SectionHeader title="Intervju mjeseca" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
         {/* Left - Image/Video - matches hero slider height */}
@@ -35,12 +35,14 @@ export function IntervjuTjedna({ featured, grid }: IntervjuTjednaProps) {
           ) : (
             <Link href={`/${featured.category?.slug || 'intervjui'}/${featured.slug}`} className="block group">
               <div className="aspect-[2/3] lg:aspect-[1/1] relative overflow-hidden rounded-sm">
-                <Image
-                  src={featured.featured_image || placeholderImage}
+                <ResponsiveImage
+                  desktopSrc={featured.featured_image_desktop || featured.featured_image}
+                  mobileSrc={featured.featured_image_mobile}
                   alt={featured.title}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 1024px) 100vw, 50vw"
+                  fallbackSrc={placeholderImage}
                 />
               </div>
             </Link>
@@ -74,12 +76,14 @@ export function IntervjuTjedna({ featured, grid }: IntervjuTjednaProps) {
               <article key={article.id} className="group animate-in">
                 <Link href={`/${article.category?.slug || 'intervjui'}/${article.slug}`}>
                   <div className="aspect-[2/3] relative overflow-hidden mb-4">
-                    <Image
-                      src={article.featured_image || placeholderImage}
+                    <ResponsiveImage
+                      desktopSrc={article.featured_image_desktop || article.featured_image}
+                      mobileSrc={article.featured_image_mobile}
                       alt={article.title}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 33vw"
+                      fallbackSrc={placeholderImage}
                     />
                   </div>
                   <p className="text-[10px] uppercase tracking-wider text-foreground/40 mb-2">

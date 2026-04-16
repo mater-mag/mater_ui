@@ -1,6 +1,6 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { SectionHeader } from './SectionHeader'
+import { ResponsiveImage } from '@/components/ui'
 import type { ArticleWithRelations } from '@/lib/supabase/homepage-queries'
 
 const placeholderImage = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1920&q=80'
@@ -16,7 +16,7 @@ export function ArticleSection({ title, articles, href, showDivider = true }: Ar
   if (articles.length === 0) return null
 
   return (
-    <section className="container py-16 md:py-24">
+    <section className="container pt-16 md:pt-24">
       <SectionHeader title={title} href={href} />
 
       {/* 3-Column Grid */}
@@ -25,12 +25,14 @@ export function ArticleSection({ title, articles, href, showDivider = true }: Ar
           <article key={article.id} className="group animate-in">
             <Link href={`/${article.category?.slug || 'vijesti'}/${article.slug}`}>
               <div className="aspect-[4/3] relative overflow-hidden mb-4">
-                <Image
-                  src={article.featured_image || placeholderImage}
+                <ResponsiveImage
+                  desktopSrc={article.featured_image_desktop || article.featured_image}
+                  mobileSrc={article.featured_image_mobile}
                   alt={article.title}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 33vw"
+                  fallbackSrc={placeholderImage}
                 />
               </div>
               <p className="text-[11px] uppercase tracking-wider text-coral font-medium mb-2">
