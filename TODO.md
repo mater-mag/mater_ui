@@ -22,9 +22,9 @@
 
 ---
 
-## Database Migration Needed
+## Database Migration - DONE
 
-Run this SQL in Supabase SQL Editor before deploying mixed media feature:
+~~Run this SQL in Supabase SQL Editor:~~ **Completed**
 
 ```sql
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS featured_video_desktop TEXT;
@@ -36,14 +36,10 @@ ALTER TABLE articles ADD CONSTRAINT articles_media_type_check
 
 ---
 
-## Pending Deployment
+## Deployed - 2026-05-05
 
-Changes ready to deploy:
 - [x] Fix 402 image error (bypass Vercel image optimization for external URLs)
 - [x] Video autoplay on article pages
 - [x] Mixed media support (image on desktop, video on mobile)
-
-Deploy command:
-```bash
-git add . && git commit -m "feat: Add video autoplay and mixed media support" && git push
-```
+- [x] Database migration
+- [x] Pushed to GitHub (commit 52b8b36)
