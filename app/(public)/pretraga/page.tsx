@@ -5,6 +5,11 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 
+// Bypass Vercel's image optimization for external URLs to avoid quota limits
+function isExternalUrl(url: string): boolean {
+  return url.startsWith('http') && !url.includes('matermag.hr')
+}
+
 const popularTags = [
   'zdravaprehrana',
   'mastitis',
@@ -124,6 +129,7 @@ function SearchContent() {
                       alt={article.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      unoptimized={isExternalUrl(article.featured_image)}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-200">

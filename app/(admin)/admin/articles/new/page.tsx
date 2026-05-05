@@ -34,7 +34,11 @@ export default function NewArticlePage() {
   const [desktopImage, setDesktopImage] = useState('')
   const [mobileImage, setMobileImage] = useState('')
   const [featuredVideo, setFeaturedVideo] = useState('')
-  const [mediaType, setMediaType] = useState<'image' | 'video'>('image')
+  const [desktopVideo, setDesktopVideo] = useState('')
+  const [mobileVideo, setMobileVideo] = useState('')
+  const [mediaType, setMediaType] = useState<'image' | 'video' | 'mixed'>('image')
+  const [desktopMediaType, setDesktopMediaType] = useState<'image' | 'video'>('image')
+  const [mobileMediaType, setMobileMediaType] = useState<'image' | 'video'>('video')
   const [parentCategoryId, setParentCategoryId] = useState('')
   const [tagId, setTagId] = useState('')
   const [authorId, setAuthorId] = useState('')
@@ -99,15 +103,32 @@ export default function NewArticlePage() {
       // Use tag (subcategory) if selected, otherwise use parent category
       const finalCategoryId = tagId || parentCategoryId || null
 
+      // Determine which fields to save based on media type
+      let imageDesktop = desktopImage || null
+      let imageMobile = mobileImage || null
+      let videoGeneric = featuredVideo || null
+      let videoDesktop = null as string | null
+      let videoMobile = null as string | null
+
+      if (mediaType === 'mixed') {
+        imageDesktop = desktopMediaType === 'image' ? desktopImage || null : null
+        imageMobile = mobileMediaType === 'image' ? mobileImage || null : null
+        videoDesktop = desktopMediaType === 'video' ? desktopVideo || null : null
+        videoMobile = mobileMediaType === 'video' ? mobileVideo || null : null
+        videoGeneric = null // Not used in mixed mode
+      }
+
       const { error } = await supabase.from('articles').insert({
         title,
         slug,
         content,
         excerpt,
-        featured_image: desktopImage || null,
-        featured_image_desktop: desktopImage || null,
-        featured_image_mobile: mobileImage || null,
-        featured_video: featuredVideo || null,
+        featured_image: imageDesktop,
+        featured_image_desktop: imageDesktop,
+        featured_image_mobile: imageMobile,
+        featured_video: videoGeneric,
+        featured_video_desktop: videoDesktop,
+        featured_video_mobile: videoMobile,
         media_type: mediaType,
         category_id: finalCategoryId,
         author_id: authorId || null,
@@ -231,9 +252,20 @@ export default function NewArticlePage() {
               >
                 Video
               </button>
+              <button
+                type="button"
+                onClick={() => setMediaType('mixed')}
+                className={`flex-1 py-2 px-3 text-sm font-medium rounded-md border transition-colors ${
+                  mediaType === 'mixed'
+                    ? 'bg-admin-green text-white border-admin-green'
+                    : 'bg-background border-border hover:bg-muted'
+                }`}
+              >
+                Različito
+              </button>
             </div>
 
-            {mediaType === 'image' ? (
+            {mediaType === 'image' && (
               <div className="space-y-6">
                 {/* Desktop Image */}
                 <div>
@@ -299,7 +331,9 @@ export default function NewArticlePage() {
                   </Button>
                 </div>
               </div>
-            ) : (
+            )}
+
+            {mediaType === 'video' && (
               <>
                 <Input
                   value={featuredVideo}
@@ -343,6 +377,156 @@ export default function NewArticlePage() {
                   Odaberi iz medijateke
                 </Button>
               </>
+            )}
+
+            {mediaType === 'mixed' && (
+              <div className="space-y-6">
+                <p className="text-xs text-muted-foreground">
+                  Odaberite različite medije za desktop i mobitel (npr. slika na desktopu, video na mobitelu)
+                </p>
+
+                {/* Desktop Media */}
+                <div className="border border-border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-foreground">Desktop</label>
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setDesktopMediaType('image')}
+                        className={`px-2 py-1 text-xs font-medium rounded ${
+                          desktopMediaType === 'image'
+                            ? 'bg-admin-green text-white'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        Slika
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDesktopMediaType('video')}
+                        className={`px-2 py-1 text-xs font-medium rounded ${
+                          desktopMediaType === 'video'
+                            ? 'bg-admin-green text-white'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        Video
+                      </button>
+                    </div>
+                  </div>
+                  {desktopMediaType === 'image' ? (
+                    <>
+                      <Input
+                        value={desktopImage}
+                        onChange={(e) => setDesktopImage(e.target.value)}
+                        placeholder="URL slike za desktop"
+                      />
+                      {desktopImage && (
+                        <div className="mt-2 aspect-video relative rounded-lg overflow-hidden bg-muted">
+                          <img src={desktopImage} alt="Desktop preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          setActiveImageField('desktop')
+                          setMediaOpen(true)
+                        }}
+                      >
+                        Odaberi sliku
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        value={desktopVideo}
+                        onChange={(e) => setDesktopVideo(e.target.value)}
+                        placeholder="YouTube, Vimeo ili URL videa"
+                      />
+                      {desktopVideo && (
+                        <div className="mt-2 aspect-video relative rounded-lg overflow-hidden bg-gray-900 flex items-center justify-center">
+                          <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* Mobile Media */}
+                <div className="border border-border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-medium text-foreground">Mobitel</label>
+                    <div className="flex gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setMobileMediaType('image')}
+                        className={`px-2 py-1 text-xs font-medium rounded ${
+                          mobileMediaType === 'image'
+                            ? 'bg-admin-green text-white'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        Slika
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMobileMediaType('video')}
+                        className={`px-2 py-1 text-xs font-medium rounded ${
+                          mobileMediaType === 'video'
+                            ? 'bg-admin-green text-white'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        Video
+                      </button>
+                    </div>
+                  </div>
+                  {mobileMediaType === 'image' ? (
+                    <>
+                      <Input
+                        value={mobileImage}
+                        onChange={(e) => setMobileImage(e.target.value)}
+                        placeholder="URL slike za mobitel"
+                      />
+                      {mobileImage && (
+                        <div className="mt-2 aspect-[9/16] max-w-[150px] relative rounded-lg overflow-hidden bg-muted">
+                          <img src={mobileImage} alt="Mobile preview" className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          setActiveImageField('mobile')
+                          setMediaOpen(true)
+                        }}
+                      >
+                        Odaberi sliku
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        value={mobileVideo}
+                        onChange={(e) => setMobileVideo(e.target.value)}
+                        placeholder="YouTube, Vimeo ili URL videa"
+                      />
+                      {mobileVideo && (
+                        <div className="mt-2 aspect-[9/16] max-w-[150px] relative rounded-lg overflow-hidden bg-gray-900 flex items-center justify-center">
+                          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
             )}
           </div>
 

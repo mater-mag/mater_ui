@@ -29,6 +29,9 @@ export function ResponsiveImage({
   const mobile = mobileSrc || desktop // Fall back to desktop if no mobile image
 
   // If both are the same, just render a single image
+  // Use unoptimized for external URLs to bypass Vercel's image optimization quota
+  const isExternal = desktop.startsWith('http') && !desktop.includes('matermag.hr')
+
   if (desktop === mobile) {
     return (
       <Image
@@ -38,6 +41,7 @@ export function ResponsiveImage({
         priority={priority}
         sizes={sizes}
         className={className}
+        unoptimized={isExternal}
       />
     )
   }

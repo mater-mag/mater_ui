@@ -12,6 +12,67 @@ interface HeroCarouselProps {
   articles: ArticleWithRelations[]
 }
 
+// Helper to render video embed
+function VideoEmbed({ videoUrl, title, className = '' }: { videoUrl: string; title: string; className?: string }) {
+  const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')
+  const isVimeo = videoUrl.includes('vimeo.com')
+
+  if (isYouTube) {
+    let videoId = ''
+    try {
+      if (videoUrl.includes('youtu.be')) {
+        videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+      } else if (videoUrl.includes('youtube.com/shorts/')) {
+        videoId = videoUrl.split('/shorts/')[1]?.split('?')[0] || ''
+      } else {
+        videoId = new URL(videoUrl).searchParams.get('v') || ''
+      }
+    } catch {
+      const match = videoUrl.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/)
+      videoId = match ? match[1] : ''
+    }
+
+    if (videoId) {
+      const params = `autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0`
+      return (
+        <iframe
+          src={`https://www.youtube.com/embed/${videoId}?${params}`}
+          className={`absolute inset-0 w-full h-full ${className}`}
+          allow="autoplay; encrypted-media; fullscreen"
+          allowFullScreen
+          title={title}
+        />
+      )
+    }
+  }
+
+  if (isVimeo) {
+    const videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
+    if (videoId) {
+      return (
+        <iframe
+          src={`https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&background=1`}
+          className={`absolute inset-0 w-full h-full ${className}`}
+          allow="autoplay; fullscreen"
+          allowFullScreen
+          title={title}
+        />
+      )
+    }
+  }
+
+  return (
+    <video
+      src={videoUrl}
+      className={`object-cover w-full h-full ${className}`}
+      autoPlay
+      muted
+      loop
+      playsInline
+    />
+  )
+}
+
 function ArticleMedia({
   article,
   className = '',
@@ -23,69 +84,59 @@ function ArticleMedia({
   sizes?: string
   priority?: boolean
 }) {
-  const isVideo = article.media_type === 'video' && article.featured_video
-
-  if (isVideo) {
-    const videoUrl = article.featured_video!
-    const isYouTube = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')
-    const isVimeo = videoUrl.includes('vimeo.com')
-
-    if (isYouTube) {
-      let videoId = ''
-      try {
-        if (videoUrl.includes('youtu.be')) {
-          videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
-        } else if (videoUrl.includes('youtube.com/shorts/')) {
-          videoId = videoUrl.split('/shorts/')[1]?.split('?')[0] || ''
-        } else {
-          videoId = new URL(videoUrl).searchParams.get('v') || ''
-        }
-      } catch {
-        const match = videoUrl.match(/(?:v=|\/)([\w-]{11})(?:\?|&|$)/)
-        videoId = match ? match[1] : ''
-      }
-
-      if (videoId) {
-        const params = `autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0`
-        return (
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}?${params}`}
-            className={`absolute inset-0 w-full h-full ${className}`}
-            allow="autoplay; encrypted-media; fullscreen"
-            allowFullScreen
-            title={article.title}
-          />
-        )
-      }
-    }
-
-    if (isVimeo) {
-      const videoId = videoUrl.split('/').pop()?.split('?')[0] || ''
-      if (videoId) {
-        return (
-          <iframe
-            src={`https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1&loop=1&background=1`}
-            className={`absolute inset-0 w-full h-full ${className}`}
-            allow="autoplay; fullscreen"
-            allowFullScreen
-            title={article.title}
-          />
-        )
-      }
-    }
+  // Mixed media type: different media for desktop vs mobile
+  if (article.media_type === 'mixed') {
+    const hasDesktopVideo = !!article.featured_video_desktop
+    const hasMobileVideo = !!article.featured_video_mobile
+    const desktopImage = article.featured_image_desktop || article.featured_image
+    const mobileImage = article.featured_image_mobile
 
     return (
-      <video
-        src={videoUrl}
-        className={`object-cover w-full h-full ${className}`}
-        autoPlay
-        muted
-        loop
-        playsInline
-      />
+      <>
+        {/* Desktop media (hidden on mobile) */}
+        <div className="hidden md:block absolute inset-0">
+          {hasDesktopVideo ? (
+            <VideoEmbed videoUrl={article.featured_video_desktop!} title={article.title} className={className} />
+          ) : desktopImage ? (
+            <img
+              src={desktopImage}
+              alt={article.title}
+              className={`absolute inset-0 w-full h-full object-cover ${className}`}
+              loading={priority ? 'eager' : 'lazy'}
+            />
+          ) : null}
+        </div>
+
+        {/* Mobile media (hidden on desktop) */}
+        <div className="md:hidden absolute inset-0">
+          {hasMobileVideo ? (
+            <VideoEmbed videoUrl={article.featured_video_mobile!} title={article.title} className={className} />
+          ) : mobileImage ? (
+            <img
+              src={mobileImage}
+              alt={article.title}
+              className={`absolute inset-0 w-full h-full object-cover ${className}`}
+              loading={priority ? 'eager' : 'lazy'}
+            />
+          ) : desktopImage ? (
+            <img
+              src={desktopImage}
+              alt={article.title}
+              className={`absolute inset-0 w-full h-full object-cover ${className}`}
+              loading={priority ? 'eager' : 'lazy'}
+            />
+          ) : null}
+        </div>
+      </>
     )
   }
 
+  // Video type: same video for all breakpoints
+  if (article.media_type === 'video' && article.featured_video) {
+    return <VideoEmbed videoUrl={article.featured_video} title={article.title} className={className} />
+  }
+
+  // Image type: use ResponsiveImage for optimized loading
   return (
     <ResponsiveImage
       desktopSrc={article.featured_image_desktop || article.featured_image}

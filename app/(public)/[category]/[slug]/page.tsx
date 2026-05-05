@@ -27,7 +27,9 @@ interface ArticleWithRelations {
   featured_image_desktop: string | null
   featured_image_mobile: string | null
   featured_video: string | null
-  media_type: 'image' | 'video'
+  featured_video_desktop: string | null
+  featured_video_mobile: string | null
+  media_type: 'image' | 'video' | 'mixed'
   category_id: string | null
   author_id: string | null
   status: 'draft' | 'published' | 'archived'
@@ -64,7 +66,7 @@ function VideoPlayer({ videoUrl, title }: { videoUrl: string; title: string }) {
       return (
         <div className="aspect-video w-full">
           <iframe
-            src={`https://www.youtube.com/embed/${videoId}?rel=0`}
+            src={`https://www.youtube.com/embed/${videoId}?rel=0&autoplay=1&mute=1`}
             className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowFullScreen
@@ -81,7 +83,7 @@ function VideoPlayer({ videoUrl, title }: { videoUrl: string; title: string }) {
       return (
         <div className="aspect-video w-full">
           <iframe
-            src={`https://player.vimeo.com/video/${videoId}`}
+            src={`https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1`}
             className="w-full h-full"
             allow="autoplay; fullscreen; picture-in-picture"
             allowFullScreen
@@ -92,13 +94,15 @@ function VideoPlayer({ videoUrl, title }: { videoUrl: string; title: string }) {
     }
   }
 
-  // Direct video file - let it determine its own dimensions
+  // Direct video file - autoplay muted
   return (
     <video
       src={videoUrl}
       className="w-full h-auto"
       controls
       playsInline
+      autoPlay
+      muted
     />
   )
 }
@@ -379,8 +383,41 @@ export default function ArticlePage() {
             </div>
           </aside>
 
-          {/* Featured Media (Image or Video) */}
-          {article.media_type === 'video' && article.featured_video ? (
+          {/* Featured Media (Image, Video, or Mixed) */}
+          {article.media_type === 'mixed' ? (
+            <figure className="mb-8">
+              <div className="aspect-[16/10] relative rounded-lg overflow-hidden">
+                {/* Desktop media */}
+                <div className="hidden md:block absolute inset-0">
+                  {article.featured_video_desktop ? (
+                    <div className="w-full h-full bg-black">
+                      <VideoPlayer videoUrl={article.featured_video_desktop} title={article.title} />
+                    </div>
+                  ) : (article.featured_image_desktop || article.featured_image) && (
+                    <img
+                      src={article.featured_image_desktop || article.featured_image || placeholderImage}
+                      alt={article.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                {/* Mobile media */}
+                <div className="md:hidden absolute inset-0">
+                  {article.featured_video_mobile ? (
+                    <div className="w-full h-full bg-black">
+                      <VideoPlayer videoUrl={article.featured_video_mobile} title={article.title} />
+                    </div>
+                  ) : (article.featured_image_mobile || article.featured_image_desktop || article.featured_image) && (
+                    <img
+                      src={article.featured_image_mobile || article.featured_image_desktop || article.featured_image || placeholderImage}
+                      alt={article.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+              </div>
+            </figure>
+          ) : article.media_type === 'video' && article.featured_video ? (
             <figure className="mb-8">
               <div className="rounded-lg overflow-hidden bg-black">
                 <VideoPlayer videoUrl={article.featured_video} title={article.title} />

@@ -12,6 +12,11 @@ interface ArticleCardProps {
   variant?: 'default' | 'featured' | 'horizontal'
 }
 
+// Bypass Vercel's image optimization for external URLs to avoid quota limits
+function isExternalUrl(url: string): boolean {
+  return url.startsWith('http') && !url.includes('matermag.hr')
+}
+
 export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) {
   const categorySlug = article.category?.slug || 'uncategorized'
   const articleUrl = `/${categorySlug}/${article.slug}`
@@ -29,6 +34,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 priority
+                unoptimized={isExternalUrl(article.featured_image)}
               />
             ) : (
               <div className="absolute inset-0 bg-muted" />
@@ -76,6 +82,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
                 sizes="128px"
+                unoptimized={isExternalUrl(article.featured_image)}
               />
             ) : (
               <div className="absolute inset-0 bg-muted" />
@@ -116,6 +123,7 @@ export function ArticleCard({ article, variant = 'default' }: ArticleCardProps) 
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized={isExternalUrl(article.featured_image)}
             />
           ) : (
             <div className="absolute inset-0 bg-muted" />

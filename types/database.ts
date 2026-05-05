@@ -8,7 +8,9 @@ export interface Article {
   featured_image_desktop: string | null
   featured_image_mobile: string | null
   featured_video: string | null
-  media_type: 'image' | 'video'
+  featured_video_desktop: string | null
+  featured_video_mobile: string | null
+  media_type: 'image' | 'video' | 'mixed'
   category_id: string | null
   author_id: string | null
   seo_data: SEOData | null
